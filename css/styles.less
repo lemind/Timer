@@ -1,0 +1,86 @@
+@import "bootstrap.css";
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,700,300);
+
+@default-width: 980px;
+
+
+.box-shadow(@style, @c) when (iscolor(@c)) {
+  -webkit-box-shadow: @style @c;
+  -moz-box-shadow:    @style @c;
+  box-shadow:         @style @c;
+}
+
+.box-shadow(@style, @alpha: 50%) when (isnumber(@alpha)) {
+  .box-shadow(@style, rgba(0, 0, 0, @alpha));
+}
+
+html, body 
+{
+	height: 100%;
+	font-family: 'Open Sans', sans-serif;
+	color: black;
+
+
+	/* Header - start */
+	.header
+	{
+		width: @default-width;
+		height: 88px;
+		background-color: #191919;
+		margin: 0 auto;
+	}
+	/* Header - end */
+
+
+	/* Content - start */
+
+	.content
+	{
+		background-color: #ebebeb;
+		max-width: @default-width;
+		margin: 0 auto;
+		padding: 10px;
+		box-sizing: border-box;
+
+		.time
+		{
+			width: 100px;
+			display: inline-block;
+			padding: 0 10px;
+			text-align: right;			
+		}
+
+		.tasks
+		{
+			margin-top: 30px;
+		}
+	}
+
+	/* Content - end */
+
+	/* Footer - start */
+
+	.footer
+	{
+		height: 68px;
+		max-width: @default-width;
+		margin: 0 auto;	
+	}
+
+	/* Footer - end */
+
+}
+
+ /* Landscape - telefony */
+@media (max-width: 480px) {  }
+
+/* От ландшафтного экрана телефона до потретного планшета */
+@media (max-width: 767px) {  }
+
+/* От портретного планшета до ландшафтного экрана и настольных дисплеев */
+@media (min-width: 768px) and (max-width: 979px) {
+
+}
+
+/* Большой дисплей */
+@media (min-width: 1200px) {  }
