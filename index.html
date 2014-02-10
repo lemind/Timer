@@ -14,7 +14,11 @@
 	<script src="./js/backbone.js" type="text/javascript"></script>
 	<script src="./js/less-1.6.1.min.js" type="text/javascript"></script>
 	<script src="./js/bootstrap.js"></script>
+
 	<script src="./js/index.js"></script>
+
+	<script src="./js/views/task_list.js"></script>
+
 
 	<!-- <link rel="stylesheet" type="text/css" href="./css/main.css" /> -->
 	<link rel="stylesheet" type="text/css" href="./css/styles.css" />
@@ -25,8 +29,8 @@
 
 <body>
 
-	<div class="header">
-		<div class="title">Timer</div>
+	<div class="header clearfix">
+		<h1>Timer</h1>
 	</div>
 
 
@@ -37,6 +41,7 @@
 		<span class="time"></span>
 
 		<button type="submit" class="btn start btn-default">Start</button>
+		<button type="submit" class="btn pause btn-default">Pause</button>
 
 		<script type="text/template" id="task-list-template">
 		<table>

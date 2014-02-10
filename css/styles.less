@@ -14,6 +14,19 @@
   .box-shadow(@style, rgba(0, 0, 0, @alpha));
 }
 
+.box-sizing (@type: border-box) {
+	-webkit-box-sizing: @type;
+	-moz-box-sizing:    @type;
+	box-sizing:         @type;
+}
+
+.transition (@transition) {
+	-webkit-transition: @transition;  
+	-moz-transition:    @transition;
+	-ms-transition:     @transition; 
+	-o-transition:      @transition;  
+}
+
 html, body 
 {
 	height: 100%;
@@ -26,8 +39,10 @@ html, body
 	{
 		width: @default-width;
 		height: 88px;
-		background-color: #191919;
+		background-color: #ebebeb;
 		margin: 0 auto;
+		padding: 10px;
+		.box-sizing(border-box);
 	}
 	/* Header - end */
 
@@ -53,6 +68,16 @@ html, body
 		.tasks
 		{
 			margin-top: 30px;
+
+			th
+			{
+				width: 100px;
+			}
+
+			td
+			{
+				text-align: center;
+			}
 		}
 	}
 

@@ -20,6 +20,24 @@ $(function(){
 		}
 	}
 
+	var time_str, 
+		task_id, 
+		time,
+		timer_status,
+		interval;
+
+	function timer_start(time_current) {
+		var start = new Date().getTime();
+
+		time_current = typeof time_current !== 'undefined' ? time_current : 0;
+
+		interval = setInterval(function () {
+			timer_status = 1;
+			time = new Date().getTime() - start + time_current;
+			time_str = msToTime(time);
+			$("span.time").text(time_str);
+		}, 1000); //this will check in every 1 second
+	}
 
 	var Task = Backbone.Model.extend({});
 
@@ -34,78 +52,70 @@ $(function(){
 	var timer_event = {};
 	_.extend(timer_event, Backbone.Events);
 
+	var Timer = Backbone.View.extend({
+		el: $("#timer"), 
+		events: {
+			"click .start": "start", 
+			"click .stop": "stop", 
+			"click .pause": "pause" 
+		},
+		start: function () {
 
-	var Start = Backbone.View.extend({
-	    el: $("#timer"), 
-	    events: {
-	        "click .start": "start", 
-	        "click .stop": "stop" 
-	    },
-	    start: function () {
+			$("button.start")
+				.text('Stop')
+				.addClass('stop')
+				.removeClass('start');
 
-	    	var time_str, task_id, time;
+			timer_start();
 
-			$("button.start").text('Stop');
-			$("button.start").addClass('stop');
-			$("button.start").removeClass('start');
+		},
+		stop: function () {
 
-	    	var start = new Date().getTime();
+			clearInterval(interval);
 
-	    	function timer () {
-	    		time = new Date().getTime() - start;
-	    		time_str = msToTime(time);
-	    		$("span.time").text(time_str);
-	    	}
+			if (tasks.length == 0) {
+				task_id = 1;
+			} else {
+				task_id = tasks.at(tasks.length - 1).id + 1;
+			}
 
-			var Interval = setInterval(function () {
-				timer();
-			}, 1000); //this will check in every 1 second
+			tasks.add(new Task({
+				id: 		task_id, 
+				time: 		time, 
+				time_str: 	time_str, 
+				desc: 		$("input.task").val()
+			}));
 
-			timer_event.once("stop", function() {
-				clearInterval(Interval);
+			console.log(JSON.stringify(tasks));
 
-			  	if (tasks.length == 0) {
-			  		task_id = 1;
-			  	} else {
-			  		task_id = tasks.at(tasks.length - 1).id + 1;
-			  	}
+			$("button.stop")
+				.text('Start')
+				.addClass('start')
+				.removeClass('stop');
+			$("button.pause").removeClass('active');
 
-			  	tasks.add(new Task({id: task_id, time: time, time_str: time_str, desc: $("input.task").val()}));
+			var taskListView = new TaskListView({tasks: tasks});
 
-			  	$("input.task").val('');
-			  	$("span.time").text('');
+			$("input.task").val('');
+			$("span.time").text('');
+			task_id = null;
+			time = null;
+			time_str = '';
+			timer_status = 0;
 
-				console.log(JSON.stringify(tasks));
+		},
+		pause: function () {
+			timer_status ? clearInterval(interval) : timer_start(time);
 
-			  	$("button.stop").text('Start');
-				$("button.stop").addClass('start');
-				$("button.stop").removeClass('stop');
+			$("button.pause").toggleClass('active');
 
+			timer_status = !timer_status;
+		}
 
-				var TaskListView = Backbone.View.extend({
-				    el: '.tasks',
-				     
-				    initialize:function(){
-				        this.render();
-				    },
-				    render: function () {
-				        var template = _.template($('#task-list-template').html(), {tasks: tasks.models});
-				        this.$el.html(template);
-				    }
-				});
-				var taskListView = new TaskListView();
-
-
-			});
-
-
-	    },
-	    stop: function () {
-			timer_event.trigger("stop");
-	    }	    
 	});
 
+	var timer = new Timer();
 
-	var start = new Start();
+});
 
-}());
+
