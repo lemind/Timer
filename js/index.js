@@ -24,7 +24,8 @@ $(function(){
 		task_id, 
 		time,
 		timer_status,
-		interval;
+		interval,
+		current_task_id;
 
 	function timer_start(time_current) {
 		var start = new Date().getTime();
@@ -45,26 +46,24 @@ $(function(){
 		model: Task
 	});
 
-	var tasks = new Tasks();  	
-
-
-	//event
-	var timer_event = {};
-	_.extend(timer_event, Backbone.Events);
+	var tasks = new Tasks();
 
 	var Timer = Backbone.View.extend({
 		el: $("#timer"), 
 		events: {
-			"click .start": "start", 
-			"click .stop": "stop", 
-			"click .pause": "pause" 
+			"click .main .start": 	"start", 
+			"click .main .stop": 	"stop", 
+			"click .main .pause": 	"pause", 
+			"click .tasks .start": 	"old_task_start" 
 		},
 		start: function () {
 
-			$("button.start")
+			$(".main button.start")
 				.text('Stop')
 				.addClass('stop')
 				.removeClass('start');
+
+			current_task_id = 0;
 
 			timer_start();
 
@@ -73,26 +72,34 @@ $(function(){
 
 			clearInterval(interval);
 
-			if (tasks.length == 0) {
-				task_id = 1;
+			if (current_task_id == 0) {
+				if (tasks.length == 0) {
+					task_id = 1;
+				} else {
+					task_id = tasks.at(tasks.length - 1).id + 1;
+				}
+
+				tasks.add(new Task({
+					id: 		task_id, 
+					time: 		time, 
+					time_str: 	time_str, 
+					desc: 		$("input.task").val()
+				}));
 			} else {
-				task_id = tasks.at(tasks.length - 1).id + 1;
+				tasks.get(current_task_id).set({
+					time: 		time,
+					time_str: 	time_str,
+					desc: 		$("input.task").val()
+				});
 			}
 
-			tasks.add(new Task({
-				id: 		task_id, 
-				time: 		time, 
-				time_str: 	time_str, 
-				desc: 		$("input.task").val()
-			}));
+			//console.log(JSON.stringify(tasks));
 
-			console.log(JSON.stringify(tasks));
-
-			$("button.stop")
+			$(".main button.stop")
 				.text('Start')
 				.addClass('start')
 				.removeClass('stop');
-			$("button.pause").removeClass('active');
+			$(".main button.pause").removeClass('active');
 
 			var taskListView = new TaskListView({tasks: tasks});
 
@@ -107,10 +114,37 @@ $(function(){
 		pause: function () {
 			timer_status ? clearInterval(interval) : timer_start(time);
 
-			$("button.pause").toggleClass('active');
+			$(".main button.pause").toggleClass('active');
 
 			timer_status = !timer_status;
-		}
+		},
+		old_task_start: function (ev) {
+
+			if(timer_status) {
+				this.stop();
+			}
+
+			var el_task_line = $(ev.target).parent().parent();
+
+			el_task_line.css('background-color', 'khaki');
+
+			current_task_id = el_task_line.attr("id");
+
+			var task = tasks.get(current_task_id);
+
+			$(".main button.start")
+				.text('Stop')
+				.addClass('stop')
+				.removeClass('start');
+
+			$(".task" + current_task_id).css('background-color', 'khaki');
+			$(".task" + current_task_id + ' .start').remove();
+
+			$("input.task").val(task.get('desc'));
+
+			timer_start(task.get('time'));
+
+		},		
 
 	});
 

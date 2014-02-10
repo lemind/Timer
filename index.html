@@ -36,12 +36,14 @@
 
 	<div class="content" id="timer">
 
-		<input type="task" class="task" placeholder="Enter task">
+		<div class="main">
+			<input type="task" class="task" placeholder="Enter task">
 
-		<span class="time"></span>
+			<span class="time"></span>
 
-		<button type="submit" class="btn start btn-default">Start</button>
-		<button type="submit" class="btn pause btn-default">Pause</button>
+			<button type="submit" class="btn start btn-default">Start</button>
+			<button type="submit" class="btn pause btn-default">Pause</button>
+		</div>
 
 		<script type="text/template" id="task-list-template">
 		<table>
@@ -50,14 +52,16 @@
 		      <th>Desc</th>
 		      <th>Time</th>
 		      <th>Time / ms</th>
+		      <th>Start</th>
 		    </tr>
 		  </thead>
 		  <tbody>
 		    <% _.each(tasks, function(task) { %>
-		      <tr>
+		      <tr class="task<%= task.get('id') %>" id="<%= task.get('id') %>">
 		        <td><%= task.get('desc') %></td>
 		        <td><%= task.get('time_str') %></td>
 		        <td><%= task.get('time') %></td>
+		        <td><button type="submit" class="btn start btn-default">Start</button></td>
 		      </tr>
 		    <% }); %>
 		  </tbody>
