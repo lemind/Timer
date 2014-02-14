@@ -35,7 +35,8 @@ $(function(){
 
 		interval = setInterval(function () {
 			timer_status = 1;
-			time = new Date().getTime() - start + time_current;
+			time = new Date().getTime() - start + parseInt(time_current);
+
 			time_str = msToTime(time);
 			$("span.time").text(time_str);
 		}, 1000); //this will check in every 1 second
@@ -46,7 +47,8 @@ $(function(){
 	});
 
 	var Tasks = Backbone.Collection.extend({
-		model: Task
+		model: Task,
+		url: 'tasks'
 	});
 
 	var tasks = new Tasks();
@@ -59,6 +61,23 @@ $(function(){
 			"click .main .pause": 	"pause", 
 			"click .tasks .start": 	"old_task_start" 
 		},
+		initialize: function() {
+			tasks.fetch({
+			    success: function (model, response) {
+			    	//console.log(new_task.toJSON());
+			    	//console.log(response);
+
+			        console.log(" tasks fetch success");
+
+					//console.log(JSON.stringify(tasks));
+
+					var taskListView = new TaskListView({tasks: tasks});
+			    },
+			    error: function (model, response) {
+			        console.log("error");
+			    }
+			});
+		},		
 		start: function () {
 
 			$(".main button.start")
@@ -74,6 +93,8 @@ $(function(){
 		stop: function () {
 
 			clearInterval(interval);
+
+			console.log('current_task_id' + current_task_id);
 
 			if (current_task_id == 0) {
 				if (tasks.length == 0) {
@@ -92,22 +113,32 @@ $(function(){
 
 				//console.log(JSON.stringify(new_task));
 
-// $.ajax({
-//   type: "POST",
-//   url: "ajax/task",
-//   data: { time: 12345, desc: "Boston" }
-// })
-//   .done(function( msg ) {
-//     console.log( "=====Data Saved: " + msg );
-//   });
-
-				tasks.add(new_task);
+				//tasks.add(new_task);
 
 				new_task.save(null, {
 				    success: function (model, response) {
 				    	//console.log(new_task.toJSON());
 				    	console.log(response);
+				    	tasks.add(new Task(response));
 				        console.log("success");
+
+						console.log(JSON.stringify(tasks));
+
+						$(".main button.stop")
+							.text('Start')
+							.addClass('start')
+							.removeClass('stop');
+						$(".main button.pause").removeClass('active');
+
+						var taskListView = new TaskListView({tasks: tasks});
+
+						$("input.task").val('');
+						$("span.time").text('');
+						task_id = null;
+						time = null;
+						time_str = '';
+						timer_status = 0;
+
 				    },
 				    error: function (model, response) {
 				        console.log("error");
@@ -119,25 +150,35 @@ $(function(){
 					time: 		time,
 					time_str: 	time_str,
 					desc: 		$("input.task").val()
+				}).save(null, {
+				    success: function (model, response) {
+				    	//console.log(new_task.toJSON());
+				    	console.log(response);
+				        console.log("_success");
+
+						//console.log(JSON.stringify(tasks));
+
+						$(".main button.stop")
+							.text('Start')
+							.addClass('start')
+							.removeClass('stop');
+						$(".main button.pause").removeClass('active');
+
+						var taskListView = new TaskListView({tasks: tasks});
+
+						$("input.task").val('');
+						$("span.time").text('');
+						task_id = null;
+						time = null;
+						time_str = '';
+						timer_status = 0;
+
+				    },
+				    error: function (model, response) {
+				        console.log("error");
+				    }
 				});
 			}
-
-			//console.log(JSON.stringify(tasks));
-
-			$(".main button.stop")
-				.text('Start')
-				.addClass('start')
-				.removeClass('stop');
-			$(".main button.pause").removeClass('active');
-
-			var taskListView = new TaskListView({tasks: tasks});
-
-			$("input.task").val('');
-			$("span.time").text('');
-			task_id = null;
-			time = null;
-			time_str = '';
-			timer_status = 0;
 
 		},
 		pause: function () {

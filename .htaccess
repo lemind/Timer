@@ -6,5 +6,9 @@ RewriteEngine On
 #
 # RewriteBase /
 
+<Limit GET POST PUT DELETE>
+  Allow from all
+</Limit>
+
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^ index.php [QSA,L]

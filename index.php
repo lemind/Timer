@@ -35,7 +35,29 @@ $app->get(
     '/',
     function () use ($app) {
         include("index.html");
+    }
+);
 
+$app->get(
+    '/tasks',
+    function () use ($app) {
+
+        try
+        {
+            $db = getConnection();
+
+            $sql = "select * from tasks";
+            $stmt = $db->prepare($sql);
+            $stmt->execute();
+
+            $tasks = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+            $db = null;            
+
+            echo json_encode($tasks);
+        } catch(PDOException $e) {
+            echo '{"error":{"text":'. $e->getMessage() .'}}';
+        }
 
     }
 );
@@ -45,13 +67,26 @@ $app->post(
     '/task',
     function () use ($app) {
 
-        $data = json_decode(file_get_contents('php://input'));
+        //$data = json_decode(file_get_contents('php://input'));
+        $data = json_decode($app->request()->getBody());
 
-        //var_dump($data);
-        $data->test = 'test';
+        try
+        {
+            $db = getConnection();
 
-        echo json_encode($data);
-        //echo '{"test":{"text":123}}';
+            $sql = "insert into tasks (`time`, `time_str`,`desc`) values(?, ?, ?)";
+            $stmt = $db->prepare($sql);
+            $stmt->execute(array(
+                $data->time,
+                $data->time_str,
+                $data->desc
+            ));
+            $data->id = $db->lastInsertId();
+
+            echo json_encode($data);
+        } catch(PDOException $e) {
+            echo '{"error":{"text":'. $e->getMessage() .'}}';
+        }
     }
 );
 
@@ -59,11 +94,31 @@ $app->post(
 $app->put(
     '/task/:id',
     function ($id) use ($app) {
-        echo '{"test":{"text":123}}';
+
+        //$data = json_decode(file_get_contents('php://input'));
+        $data = json_decode($app->request()->getBody());
+
+        //echo json_encode($data);
+
+        try
+        {
+            $db = getConnection();
+
+            $sql = "update tasks set `time` = :time, `time_str` = :time_str, `desc` = :desc where id=".$id;
+            $stmt = $db->prepare($sql);
+            $stmt->bindParam(":time", $data->time);
+            $stmt->bindParam(":time_str", $data->time_str);
+            $stmt->bindParam(":desc", $data->desc);
+            $stmt->execute();
+
+            echo '{"status": "ok"}';
+        } catch(PDOException $e) {
+            echo '{"error":{"text":'. $e->getMessage() .'}}';
+        }
+
     }
 );
 
-// PUT route
 $app->get(
     '/task/:id',
     function ($id) use ($app) {
@@ -91,3 +146,13 @@ $app->delete(
  * and returns the HTTP response to the HTTP client.
  */
 $app->run();
+
+function getConnection() {
+    $dbhost="127.0.0.1";
+    $dbuser="root";
+    $dbpass="";
+    $dbname="timer";
+    $dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpass);  
+    $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    return $dbh;
+}
