@@ -20,6 +20,7 @@ $(function(){
 		}
 	}
 
+
 	var time_str, 
 		task_id, 
 		time,
@@ -40,7 +41,9 @@ $(function(){
 		}, 1000); //this will check in every 1 second
 	}
 
-	var Task = Backbone.Model.extend({});
+	var Task = Backbone.Model.extend({
+		urlRoot: 'task'
+	});
 
 	var Tasks = Backbone.Collection.extend({
 		model: Task
@@ -79,12 +82,38 @@ $(function(){
 					task_id = tasks.at(tasks.length - 1).id + 1;
 				}
 
-				tasks.add(new Task({
-					id: 		task_id, 
+				var new_task = new Task({
+					///id: 		task_id, 
 					time: 		time, 
 					time_str: 	time_str, 
 					desc: 		$("input.task").val()
-				}));
+				});
+
+
+				//console.log(JSON.stringify(new_task));
+
+// $.ajax({
+//   type: "POST",
+//   url: "ajax/task",
+//   data: { time: 12345, desc: "Boston" }
+// })
+//   .done(function( msg ) {
+//     console.log( "=====Data Saved: " + msg );
+//   });
+
+				tasks.add(new_task);
+
+				new_task.save(null, {
+				    success: function (model, response) {
+				    	//console.log(new_task.toJSON());
+				    	console.log(response);
+				        console.log("success");
+				    },
+				    error: function (model, response) {
+				        console.log("error");
+				    }
+				});
+
 			} else {
 				tasks.get(current_task_id).set({
 					time: 		time,
