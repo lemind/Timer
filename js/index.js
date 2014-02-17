@@ -42,6 +42,23 @@ $(function(){
 		}, 1000); //this will check in every 1 second
 	}
 
+	function before_task_save () {
+		$(".main button.stop")
+			.text('Start')
+			.addClass('start')
+			.removeClass('stop');
+		$(".main button.pause").removeClass('active');
+
+		var taskListView = new TaskListView({tasks: tasks});
+
+		$("input.task").val('');
+		$("span.time").text('');
+		task_id = null;
+		time = null;
+		time_str = '';
+		timer_status = 0;
+	}
+
 	var Task = Backbone.Model.extend({
 		urlRoot: 'task'
 	});
@@ -59,7 +76,8 @@ $(function(){
 			"click .main .start": 	"start", 
 			"click .main .stop": 	"stop", 
 			"click .main .pause": 	"pause", 
-			"click .tasks .start": 	"old_task_start" 
+			"click .tasks .start": 	"old_task_start",
+			"click .tasks .delete":	"delete_task" 
 		},
 		initialize: function() {
 			tasks.fetch({
@@ -124,20 +142,7 @@ $(function(){
 
 						console.log(JSON.stringify(tasks));
 
-						$(".main button.stop")
-							.text('Start')
-							.addClass('start')
-							.removeClass('stop');
-						$(".main button.pause").removeClass('active');
-
-						var taskListView = new TaskListView({tasks: tasks});
-
-						$("input.task").val('');
-						$("span.time").text('');
-						task_id = null;
-						time = null;
-						time_str = '';
-						timer_status = 0;
+						before_task_save();
 
 				    },
 				    error: function (model, response) {
@@ -157,21 +162,7 @@ $(function(){
 				        console.log("_success");
 
 						//console.log(JSON.stringify(tasks));
-
-						$(".main button.stop")
-							.text('Start')
-							.addClass('start')
-							.removeClass('stop');
-						$(".main button.pause").removeClass('active');
-
-						var taskListView = new TaskListView({tasks: tasks});
-
-						$("input.task").val('');
-						$("span.time").text('');
-						task_id = null;
-						time = null;
-						time_str = '';
-						timer_status = 0;
+						before_task_save();
 
 				    },
 				    error: function (model, response) {
@@ -215,6 +206,34 @@ $(function(){
 			timer_start(task.get('time'));
 
 		},		
+		delete_task: function (ev) {
+
+			if(timer_status) {
+				this.stop();
+			}
+
+			var el_task_line = $(ev.target).parent().parent();
+
+			current_task_id = el_task_line.attr("id");
+
+			if (confirm('Are you sure you want to delete this task?')) {
+
+				tasks.get(current_task_id).destroy({
+				    success: function (model, response) {
+
+				    	console.log(response);
+				        console.log("delete_success");
+
+ 						$(".task" + current_task_id).remove();
+
+				    },
+				    error: function (model, response) {
+				        console.log("error");
+				    }
+				});
+			}
+
+		},
 
 	});
 

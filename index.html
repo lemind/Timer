@@ -53,6 +53,7 @@
 		      <th>Time</th>
 		      <th>Time / ms</th>
 		      <th>Start</th>
+		      <th>Delete</th>
 		    </tr>
 		  </thead>
 		  <tbody>
@@ -62,6 +63,7 @@
 		        <td><%= task.get('time_str') %></td>
 		        <td><%= task.get('time') %></td>
 		        <td><button type="submit" class="btn start btn-default">Start</button></td>
+		        <td><button type="submit" class="btn delete btn-default">Delete</button></td>
 		      </tr>
 		    <% }); %>
 		  </tbody>

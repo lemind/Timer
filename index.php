@@ -119,6 +119,26 @@ $app->put(
     }
 );
 
+$app->delete(
+    '/task/:id',
+    function ($id) use ($app) {
+
+        try
+        {
+            $db = getConnection();
+
+            $sql = "delete from tasks where id=".$id;
+            $stmt = $db->prepare($sql);
+            $stmt->execute();
+
+            echo '{"status": "ok"}';
+        } catch(PDOException $e) {
+            echo '{"error":{"text":'. $e->getMessage() .'}}';
+        }
+
+    }
+);
+
 $app->get(
     '/task/:id',
     function ($id) use ($app) {
