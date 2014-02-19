@@ -52,7 +52,7 @@ $app->get(
 
             $tasks = $stmt->fetchAll(PDO::FETCH_OBJ);
 
-            $db = null;            
+            $db = null;
 
             echo json_encode($tasks);
         } catch(PDOException $e) {
@@ -74,12 +74,13 @@ $app->post(
         {
             $db = getConnection();
 
-            $sql = "insert into tasks (`time`, `time_str`,`desc`) values(?, ?, ?)";
+            $sql = "insert into tasks (`time`, `time_str`,`desc`, `project_id`) values(?, ?, ?, ?)";
             $stmt = $db->prepare($sql);
             $stmt->execute(array(
                 $data->time,
                 $data->time_str,
-                $data->desc
+                $data->desc,
+                $data->project_id
             ));
             $data->id = $db->lastInsertId();
 
@@ -104,11 +105,12 @@ $app->put(
         {
             $db = getConnection();
 
-            $sql = "update tasks set `time` = :time, `time_str` = :time_str, `desc` = :desc where id=".$id;
+            $sql = "update tasks set `time` = :time, `time_str` = :time_str, `desc` = :desc, `project_id` = :project_id where id=".$id;
             $stmt = $db->prepare($sql);
             $stmt->bindParam(":time", $data->time);
             $stmt->bindParam(":time_str", $data->time_str);
             $stmt->bindParam(":desc", $data->desc);
+            $stmt->bindParam(":project_id", $data->project_id);
             $stmt->execute();
 
             echo '{"status": "ok"}';
@@ -139,6 +141,59 @@ $app->delete(
     }
 );
 
+
+// POST route
+$app->get(
+    '/projects',
+    function () use ($app) {
+
+        try
+        {
+            $db = getConnection();
+
+            $sql = "select * from projects";
+            $stmt = $db->prepare($sql);
+            $stmt->execute();
+
+            $projects = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+            $db = null;            
+
+            echo json_encode($projects);
+        } catch(PDOException $e) {
+            echo '{"error":{"text":'. $e->getMessage() .'}}';
+        }
+    }
+);
+
+
+// POST route
+$app->post(
+    '/project',
+    function () use ($app) {
+
+        $data = json_decode($app->request()->getBody());
+
+        try
+        {
+            $db = getConnection();
+
+            $sql = "insert into projects (`name`) values(?)";
+            $stmt = $db->prepare($sql);
+            $stmt->execute(array(
+                $data->name
+            ));
+            $data->id = $db->lastInsertId();
+
+            echo json_encode($data);
+        } catch(PDOException $e) {
+            echo '{"error project":{"text":'. $e->getMessage() .'}}';
+        }
+    }
+);
+
+
+//sample
 $app->get(
     '/task/:id',
     function ($id) use ($app) {
@@ -146,25 +201,6 @@ $app->get(
     }
 );
 
-// PATCH route
-$app->patch('/patch', function () {
-    echo 'This is a PATCH route';
-});
-
-// DELETE route
-$app->delete(
-    '/delete',
-    function () {
-        echo 'This is a DELETE route';
-    }
-);
-
-/**
- * Step 4: Run the Slim application
- *
- * This method should be called last. This executes the Slim application
- * and returns the HTTP response to the HTTP client.
- */
 $app->run();
 
 function getConnection() {

@@ -20,6 +20,95 @@ $(function(){
 		}
 	}
 
+	//project start
+
+	var Project = Backbone.Model.extend({
+		urlRoot: 'project'
+	});
+
+	var Projects = Backbone.Collection.extend({
+		model: Project,
+		url: 'projects'
+	});
+
+	var projects = new Projects(),
+		last_new_project;
+
+
+	var results = [];
+
+	function project_select2_init () {
+
+		projects.fetch({
+		    success: function (model, response) {
+		        console.log("projects fetch success");
+
+				$('#project').select2({
+					placeholder: "Select project",
+					quietMillis: 100,
+					data: projects.toJSON(),
+					// ajax: {
+					// 	url: 'projects',
+					// 	dataType: 'json',
+					// 	type: 'GET',
+					// 	// data: function (term) {
+					// 	// 	// return {
+					// 	// 	// 	term: term
+					// 	// 	// };
+					// 	// },
+					// 	results: function (data) {
+					// 		results = data;
+
+					// 		return {
+					// 			results: data
+					// 		};
+					// 	}
+					// },
+					formatResult: function(post) {
+						return post.name;
+					},
+					formatSelection: function(post) {
+						return post.name;
+					},
+				    createSearchChoice: function (term) {
+				        return { id: 0, name: term };
+				    }	
+				}).on("select2-selecting", function(e) {
+
+					if (e.val == 0) {
+
+						var new_project = new Project({
+							name: e.object.name
+						});
+
+
+						console.log('new project '+JSON.stringify(new_project));
+
+						new_project.save(null, {
+						    success: function (model, response) {
+						    	projects.add(new Project(response));
+
+						    	//add select2 data new project
+								//console.log(response);
+								//$("#project").select2("val", $("#project").select2("val").concat(response));
+
+						        last_new_project = response;
+						    },
+						    error: function (model, response) {
+						        console.log("save new project error");
+						    }
+						});
+					}
+
+				});
+
+		    },
+		    error: function (model, response) {
+		        console.log("projects fetch error");
+		    }
+		});
+
+	}
 
 	var time_str, 
 		task_id, 
@@ -42,17 +131,20 @@ $(function(){
 		}, 1000); //this will check in every 1 second
 	}
 
-	function before_task_save () {
+	function after_task_save () {
 		$(".main button.stop")
 			.text('Start')
 			.addClass('start')
 			.removeClass('stop');
 		$(".main button.pause").removeClass('active');
 
-		var taskListView = new TaskListView({tasks: tasks});
+		console.log('after_task_save');
+		console.log(projects);
+		var taskListView = new TaskListView({tasks: tasks, projects: projects});
 
 		$("input.task").val('');
 		$("span.time").text('');
+		$("#project").select2('data', '');
 		task_id = null;
 		time = null;
 		time_str = '';
@@ -82,14 +174,13 @@ $(function(){
 		initialize: function() {
 			tasks.fetch({
 			    success: function (model, response) {
-			    	//console.log(new_task.toJSON());
-			    	//console.log(response);
+			        console.log("tasks fetch success");
 
-			        console.log(" tasks fetch success");
-
-					//console.log(JSON.stringify(tasks));
-
-					var taskListView = new TaskListView({tasks: tasks});
+					project_select2_init();
+					
+					setTimeout(function() {
+						var taskListView = new TaskListView({tasks: tasks, projects: projects});
+					}, 200);					
 			    },
 			    error: function (model, response) {
 			        console.log("error");
@@ -97,6 +188,8 @@ $(function(){
 			});
 		},		
 		start: function () {
+
+			if (!$("#project").select2('data')) $("#project").select2('data', {id: 1, name: 'no project'});
 
 			$(".main button.start")
 				.text('Stop')
@@ -110,40 +203,26 @@ $(function(){
 		},
 		stop: function () {
 
+			var selected_project = $("#project").select2('data');
+
 			clearInterval(interval);
 
-			console.log('current_task_id' + current_task_id);
+			selected_project.id == 0 ? selected_project = last_new_project : selected_project;
 
 			if (current_task_id == 0) {
-				if (tasks.length == 0) {
-					task_id = 1;
-				} else {
-					task_id = tasks.at(tasks.length - 1).id + 1;
-				}
 
 				var new_task = new Task({
-					///id: 		task_id, 
 					time: 		time, 
 					time_str: 	time_str, 
+					project_id:	selected_project.id, 
 					desc: 		$("input.task").val()
 				});
 
-
-				//console.log(JSON.stringify(new_task));
-
-				//tasks.add(new_task);
-
 				new_task.save(null, {
 				    success: function (model, response) {
-				    	//console.log(new_task.toJSON());
-				    	console.log(response);
 				    	tasks.add(new Task(response));
-				        console.log("success");
 
-						console.log(JSON.stringify(tasks));
-
-						before_task_save();
-
+						after_task_save();
 				    },
 				    error: function (model, response) {
 				        console.log("error");
@@ -154,16 +233,11 @@ $(function(){
 				tasks.get(current_task_id).set({
 					time: 		time,
 					time_str: 	time_str,
+					project_id:	selected_project.id,
 					desc: 		$("input.task").val()
 				}).save(null, {
 				    success: function (model, response) {
-				    	//console.log(new_task.toJSON());
-				    	console.log(response);
-				        console.log("_success");
-
-						//console.log(JSON.stringify(tasks));
-						before_task_save();
-
+						after_task_save();
 				    },
 				    error: function (model, response) {
 				        console.log("error");
@@ -201,7 +275,9 @@ $(function(){
 			$(".task" + current_task_id).css('background-color', 'khaki');
 			$(".task" + current_task_id + ' .start').remove();
 
+			console.log('toshonada');
 			$("input.task").val(task.get('desc'));
+			$("#project").select2('data', {id: task.get('project_id'), name: projects.get(task.get('project_id')).get('name')});
 
 			timer_start(task.get('time'));
 
