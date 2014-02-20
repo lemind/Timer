@@ -46,7 +46,7 @@ $(function(){
 				$('#project').select2({
 					placeholder: "Select project",
 					quietMillis: 100,
-					data: projects.toJSON(),
+					data: function() { return {results: projects.toJSON()}; },
 					// ajax: {
 					// 	url: 'projects',
 					// 	dataType: 'json',
@@ -87,10 +87,6 @@ $(function(){
 						new_project.save(null, {
 						    success: function (model, response) {
 						    	projects.add(new Project(response));
-
-						    	//add select2 data new project
-								//console.log(response);
-								//$("#project").select2("val", $("#project").select2("val").concat(response));
 
 						        last_new_project = response;
 						    },
