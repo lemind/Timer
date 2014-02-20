@@ -12,10 +12,10 @@ $(function(){
 		timer = 			$("#timer"),
 		select2_project = 	$("#project"),
 		main_time = 		$("span.time"),
-		main_button_stop = 	$(".main button.stop"),
-		main_button_pause = $(".main button.pause"),
 		input_task_name = 	$("input.task"),
-		main_button_start = $(".main button.start");
+		main_button_start = $(".main button.start")
+		main_button_stop = 	(function() { return $(".main button.stop"); }),
+		main_button_pause = $(".main button.pause");
 
 	function project_select2_init () {
 
@@ -67,6 +67,7 @@ $(function(){
 	}
 
 	function timer_start(time_current) {
+
 		var start = new Date().getTime();
 
 		time_current = typeof time_current !== 'undefined' ? time_current : 0;
@@ -78,10 +79,12 @@ $(function(){
 			time_str = msToTime(time);
 			main_time.text(time_str);
 		}, 1000); //this will check in every 1 second
+		
 	}
 
 	function after_task_save () {
-		main_button_stop
+
+		main_button_stop.call()
 			.text('Start')
 			.addClass('start')
 			.removeClass('stop');
@@ -98,6 +101,7 @@ $(function(){
 		time = null;
 		time_str = '';
 		timer_status = 0;
+
 	}
 
 	var Timer = Backbone.View.extend({
@@ -110,6 +114,7 @@ $(function(){
 			"click .tasks .delete":	"delete_task" 
 		},
 		initialize: function() {
+
 			tasks.fetch({
 			    success: function (model, response) {
 			        console.log("tasks fetch success");
@@ -124,6 +129,7 @@ $(function(){
 			        console.log("error: tasks fetch");
 			    }
 			});
+
 		},		
 		start: function () {
 
@@ -185,11 +191,13 @@ $(function(){
 
 		},
 		pause: function () {
+
 			timer_status ? clearInterval(interval) : timer_start(time);
 
 			main_button_pause.toggleClass('active');
 
 			timer_status = !timer_status;
+
 		},
 		old_task_start: function (ev) {
 
