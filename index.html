@@ -19,6 +19,7 @@
 
 	<script src="./js/models/task.js"></script>
 	<script src="./js/models/project.js"></script>
+	<script src="./js/models/tag.js"></script>
 	<script src="./js/helper.js"></script>
 
 	<script src="./js/index.js"></script>
@@ -44,12 +45,14 @@
 
 		<div class="main">
 			<input type="task" class="task" placeholder="Enter task">
-			<div class="select2" id="project"></div>
+			<div class="select2" id="projects"></div>
 
 			<span class="time"></span>
 
 			<button type="submit" class="btn start btn-default">Start</button>
 			<button type="submit" class="btn pause btn-default">Pause</button>
+
+			<div class="select2" id="tags"></div>
 		</div>
 
 		<script type="text/template" id="task-list-template">
@@ -62,6 +65,7 @@
 		      <th>Project</th>
 		      <th>Start</th>
 		      <th>Delete</th>
+		      <th>Tags</th>
 		    </tr>
 		  </thead>
 		  <tbody>
@@ -70,9 +74,16 @@
 		        <td><%= task.get('desc') %></td>
 		        <td><%= task.get('time_str') %></td>
 		        <td><%= task.get('time') %></td>
-		        <td><%= projects.get(task.get('project_id')).get('name') %></td>
+		        <td class="project <%= colors['projects'][projects.get(task.get('project_id')).get('color')] %>"><%= projects.get(task.get('project_id')).get('name') %></td>
 		        <td><button type="submit" class="btn start btn-default">Start</button></td>
 		        <td><button type="submit" class="btn delete btn-default">Delete</button></td>
+		        <td>
+		        	<% _.each(task.get('tags_ids_arr'), function(tag_id) { %>
+		        		<span class="tag <%= colors['tags'][tags.get(tag_id).get('color')] %>"><%= tags.get(tag_id).get('name') %></span>
+		        	<% }); %>
+		        </td>
+
+
 		      </tr>
 		    <% }); %>
 		  </tbody>

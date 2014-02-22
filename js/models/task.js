@@ -6,6 +6,26 @@ window.Task = Backbone.Model.extend({
 
 window.Tasks = Backbone.Collection.extend({
 
+	initialize: function() { 
+
+		this.on('change:tags', this.changeTags, this);
+
+	},
+
+	changeTags: function(model, val, options) { 
+
+		if (model.get('tags')) {
+			var tags_ids_arr = $.map(model.get('tags').split(','), function(val){
+				return parseInt(val);
+			});
+
+			model.set({tags_ids_arr: tags_ids_arr});
+		} else {
+			model.set({tags_ids_arr: null});
+		}
+
+	},
+
     model: Task,
     url: 'tasks'
 

@@ -38,6 +38,7 @@ $app->get(
     }
 );
 
+// get tasks
 $app->get(
     '/tasks',
     function () use ($app) {
@@ -62,7 +63,7 @@ $app->get(
     }
 );
 
-// POST route
+// create task
 $app->post(
     '/task',
     function () use ($app) {
@@ -74,13 +75,14 @@ $app->post(
         {
             $db = getConnection();
 
-            $sql = "insert into tasks (`time`, `time_str`,`desc`, `project_id`) values(?, ?, ?, ?)";
+            $sql = "insert into tasks (`time`, `time_str`,`desc`, `project_id`, `tags`) values(?, ?, ?, ?, ?)";
             $stmt = $db->prepare($sql);
             $stmt->execute(array(
                 $data->time,
                 $data->time_str,
                 $data->desc,
-                $data->project_id
+                $data->project_id,
+                $data->tags
             ));
             $data->id = $db->lastInsertId();
 
@@ -91,26 +93,24 @@ $app->post(
     }
 );
 
-// PUT route
+// update
 $app->put(
     '/task/:id',
     function ($id) use ($app) {
 
-        //$data = json_decode(file_get_contents('php://input'));
         $data = json_decode($app->request()->getBody());
-
-        //echo json_encode($data);
 
         try
         {
             $db = getConnection();
 
-            $sql = "update tasks set `time` = :time, `time_str` = :time_str, `desc` = :desc, `project_id` = :project_id where id=".$id;
+            $sql = "update tasks set `time` = :time, `time_str` = :time_str, `desc` = :desc, `project_id` = :project_id, `tags` = :tags where id=".$id;
             $stmt = $db->prepare($sql);
             $stmt->bindParam(":time", $data->time);
             $stmt->bindParam(":time_str", $data->time_str);
             $stmt->bindParam(":desc", $data->desc);
             $stmt->bindParam(":project_id", $data->project_id);
+            $stmt->bindParam(":tags", $data->tags);
             $stmt->execute();
 
             echo '{"status": "ok"}';
@@ -121,6 +121,7 @@ $app->put(
     }
 );
 
+// delete task
 $app->delete(
     '/task/:id',
     function ($id) use ($app) {
@@ -142,7 +143,7 @@ $app->delete(
 );
 
 
-// POST route
+// get projects
 $app->get(
     '/projects',
     function () use ($app) {
@@ -167,7 +168,7 @@ $app->get(
 );
 
 
-// POST route
+// create project 
 $app->post(
     '/project',
     function () use ($app) {
@@ -178,10 +179,11 @@ $app->post(
         {
             $db = getConnection();
 
-            $sql = "insert into projects (`name`) values(?)";
+            $sql = "insert into projects (`name`, `color`) values(?, ?)";
             $stmt = $db->prepare($sql);
             $stmt->execute(array(
-                $data->name
+                $data->name,
+                $data->color
             ));
             $data->id = $db->lastInsertId();
 
@@ -192,14 +194,64 @@ $app->post(
     }
 );
 
-
-//sample
+// get tags
 $app->get(
-    '/task/:id',
-    function ($id) use ($app) {
-        echo '{"get":{"text":'. $id.'}}';
+    '/tags',
+    function () use ($app) {
+
+        try
+        {
+            $db = getConnection();
+
+            $sql = "select * from tags";
+            $stmt = $db->prepare($sql);
+            $stmt->execute();
+
+            $tags = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+            $db = null;            
+
+            echo json_encode($tags);
+        } catch(PDOException $e) {
+            echo '{"error":{"text":'. $e->getMessage() .'}}';
+        }
     }
 );
+
+
+// create project 
+$app->post(
+    '/tag',
+    function () use ($app) {
+
+        $data = json_decode($app->request()->getBody());
+
+        try
+        {
+            $db = getConnection();
+
+            $sql = "insert into tags (`name`, `color`) values(?, ?)";
+            $stmt = $db->prepare($sql);
+            $stmt->execute(array(
+                $data->name,
+                $data->color
+            ));
+            $data->id = $db->lastInsertId();
+
+            echo json_encode($data);
+        } catch(PDOException $e) {
+            echo '{"error project":{"text":'. $e->getMessage() .'}}';
+        }
+    }
+);
+
+//sample
+// $app->get(
+//     '/task/:id',
+//     function ($id) use ($app) {
+//         echo '{"get":{"text":'. $id.'}}';
+//     }
+// );
 
 $app->run();
 

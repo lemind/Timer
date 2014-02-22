@@ -2,28 +2,31 @@ $(function(){
 
 	var projects = new Projects(),
 		last_new_project,
+		last_new_tag,
 		time_str,  
 		time,
 		timer_status,
 		interval,
 		current_task_id,
 		tasks = new Tasks(),
+		tags = new Tags(),
 
 		timer = 			$("#timer"),
-		select2_project = 	$("#project"),
+		select2_projects = 	$("#projects"),
+		select2_tags = 		$("#tags"),
 		main_time = 		$("span.time"),
 		input_task_name = 	$("input.task"),
 		main_button_start = $(".main button.start")
 		main_button_stop = 	(function() { return $(".main button.stop"); }),
 		main_button_pause = $(".main button.pause");
 
-	function project_select2_init () {
+	function projects_select2_init () {
 
 		projects.fetch({
 		    success: function (model, response) {
 		        console.log("projects fetch success");
 
-				select2_project.select2({
+				select2_projects.select2({
 					placeholder: "Select project",
 					quietMillis: 100,
 					data: function() { return {results: projects.toJSON()}; },
@@ -35,13 +38,14 @@ $(function(){
 					},
 				    createSearchChoice: function (term) {
 				        return { id: 0, name: term };
-				    }	
+				    }
 				}).on("select2-selecting", function(e) {
 
 					if (e.val == 0) {
 
 						var new_project = new Project({
-							name: e.object.name
+							name: e.object.name,
+							color: 1 + Math.floor(Math.random() * 9)
 						});
 
 						new_project.save(null, {
@@ -52,6 +56,56 @@ $(function(){
 						    },
 						    error: function (model, response) {
 						        console.log("error: save new project");
+						    }
+						});
+					}
+
+				});
+
+		    },
+		    error: function (model, response) {
+		        console.log("error: projects fetch");
+		    }
+		});
+
+	}
+
+	function tags_select2_init () {
+
+		tags.fetch({
+		    success: function (model, response) {
+		        console.log("tags fetch success");
+
+				select2_tags.select2({
+					placeholder: "Select tags",
+					quietMillis: 100,
+					multiple: true,
+					data: function() { return {results: tags.toJSON()}; },
+					formatResult: function(post) {
+						return post.name;
+					},
+					formatSelection: function(post) {
+						return post.name;
+					},
+				    createSearchChoice: function (term) {
+				        return { id: 0, name: term };
+				    }
+				}).on("select2-selecting", function(e) {
+
+					if (e.val == 0) {
+
+						var new_tag = new Tag({
+							name: e.object.name,
+							color: 1 + Math.floor(Math.random() * 9)
+						});
+
+						new_tag.save(null, {
+						    success: function (model, response) {
+						    	tags.add(new Tag(response));
+						    	last_new_tag = response;
+						    },
+						    error: function (model, response) {
+						        console.log("error: save new tag");
 						    }
 						});
 					}
@@ -79,7 +133,7 @@ $(function(){
 			time_str = msToTime(time);
 			main_time.text(time_str);
 		}, 1000); //this will check in every 1 second
-		
+
 	}
 
 	function after_task_save () {
@@ -92,11 +146,12 @@ $(function(){
 		//if press save on timer pause
 		main_button_pause.removeClass('active');
 
-		var taskListView = new TaskListView({tasks: tasks, projects: projects});
+		var taskListView = new TaskListView({tasks: tasks, projects: projects, tags: tags});
 
 		input_task_name.val('');
 		main_time.text('');
-		select2_project.select2('data', '');
+		select2_projects.select2('data', '');
+		select2_tags.select2('data', '');
 
 		time = null;
 		time_str = '';
@@ -119,11 +174,23 @@ $(function(){
 			    success: function (model, response) {
 			        console.log("tasks fetch success");
 
-					project_select2_init();
+					projects_select2_init();
+					tags_select2_init();
+
+					//todo move to model
+					tasks.forEach(function(task) {
+						if (task.get('tags')) {
+							var tags_ids_arr = $.map(task.get('tags').split(','), function(val){
+							    return parseInt(val);
+							});
+
+							tasks.get(task.id).set({'tags_ids_arr': tags_ids_arr});
+						}
+					});
 					
 					setTimeout(function() {
-						var taskListView = new TaskListView({tasks: tasks, projects: projects});
-					}, 200);					
+						var taskListView = new TaskListView({tasks: tasks, projects: projects, tags: tags});
+					}, 200);
 			    },
 			    error: function (model, response) {
 			        console.log("error: tasks fetch");
@@ -133,7 +200,7 @@ $(function(){
 		},		
 		start: function () {
 
-			!select2_project.select2('data') && select2_project.select2('data', {id: 1, name: 'no project'});
+			!select2_projects.select2('data') && select2_projects.select2('data', {id: 1, name: 'no project'});
 
 			main_button_start
 				.text('Stop')
@@ -147,7 +214,13 @@ $(function(){
 		},
 		stop: function () {
 
-			var selected_project = select2_project.select2('data');
+			var selected_project = select2_projects.select2('data');
+			var selected_tags = select2_tags.select2('data');
+			var tags_ids_arr = [];
+
+			selected_tags.forEach(function(tag) {
+				tag.id == 0 ? tags_ids_arr.push(last_new_tag.id) : tags_ids_arr.push(tag.id);
+			});
 
 			clearInterval(interval);
 
@@ -156,14 +229,21 @@ $(function(){
 			if (current_task_id == 0) {
 
 				var new_task = new Task({
-					time: 		time, 
-					time_str: 	time_str, 
-					project_id:	selected_project.id, 
-					desc: 		input_task_name.val()
+					time: 			time, 
+					time_str: 		time_str, 
+					project_id:		selected_project.id, 
+					desc: 			input_task_name.val(),
+					tags:			tags_ids_arr.join()
 				});
 
 				new_task.save(null, {
 				    success: function (model, response) {
+						var tags_ids_arr = $.map(response.tags.split(','), function(val){
+							return parseInt(val);
+						});
+
+						response.tags_ids_arr = tags_ids_arr;
+
 				    	tasks.add(new Task(response));
 
 						after_task_save();
@@ -175,10 +255,11 @@ $(function(){
 
 			} else {
 				tasks.get(current_task_id).set({
-					time: 		time,
-					time_str: 	time_str,
-					project_id:	selected_project.id,
-					desc: 		input_task_name.val()
+					time: 			time,
+					time_str: 		time_str,
+					project_id:		selected_project.id,
+					desc: 			input_task_name.val(),
+					tags:			tags_ids_arr.join()
 				}).save(null, {
 				    success: function (model, response) {
 						after_task_save();
@@ -201,6 +282,9 @@ $(function(){
 		},
 		old_task_start: function (ev) {
 
+			var tags_ids = [],
+				current_task_tags = [];
+
 			timer_status && this.stop();
 
 			var el_task_line = $(ev.target).parent().parent();
@@ -222,7 +306,17 @@ $(function(){
 				$(".task" + current_task_id + ' .start').remove();
 
 				input_task_name.val(task.get('desc'));
-				select2_project.select2('data', {id: task.get('project_id'), name: projects.get(task.get('project_id')).get('name')});
+				select2_projects.select2('data', {id: task.get('project_id'), name: projects.get(task.get('project_id')).get('name')});
+
+				if (task.get('tags')) {
+					tags_ids = task.get('tags').split(',');
+
+					tags_ids.forEach(function(id) {
+						current_task_tags.push(tags.get(id).toJSON());
+					});
+
+					select2_tags.select2("data", current_task_tags);
+				}
 
 				timer_start(task.get('time'));
 			}, 200);
