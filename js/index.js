@@ -2,7 +2,7 @@ $(function(){
 
 	var projects = new Projects(),
 		last_new_project,
-		last_new_tag,
+		last_new_tags = [],
 		time_str,  
 		time,
 		timer_status,
@@ -88,11 +88,11 @@ $(function(){
 						return post.name;
 					},
 				    createSearchChoice: function (term) {
-				        return { id: 0, name: term };
+				        return { id: term, name: term, fl: 'new' };
 				    }
 				}).on("select2-selecting", function(e) {
 
-					if (e.val == 0) {
+					if (e.object.fl == 'new') {
 
 						var new_tag = new Tag({
 							name: e.object.name,
@@ -102,7 +102,11 @@ $(function(){
 						new_tag.save(null, {
 						    success: function (model, response) {
 						    	tags.add(new Tag(response));
-						    	last_new_tag = response;
+						    	last_new_tags.push(response.id);
+						    	console.log('last_new_tag');
+						    	console.log(last_new_tags);
+						    	console.log(e);
+						    	console.log(select2_tags.select2('data'));
 						    },
 						    error: function (model, response) {
 						        console.log("error: save new tag");
@@ -219,8 +223,13 @@ $(function(){
 			var tags_ids_arr = [];
 
 			selected_tags.forEach(function(tag) {
-				tag.id == 0 ? tags_ids_arr.push(last_new_tag.id) : tags_ids_arr.push(tag.id);
+				if (tag.fl != 'new') tags_ids_arr.push(tag.id);
 			});
+
+			if (last_new_tags.length) {
+				tags_ids_arr = tags_ids_arr.concat(last_new_tags);	
+				last_new_tags = [];
+			}
 
 			clearInterval(interval);
 
