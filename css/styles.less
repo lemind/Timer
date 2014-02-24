@@ -27,9 +27,11 @@
 	-o-transition:      @transition;  
 }
 
+@tr-height: 38px;
+
 //colors
 //tags
-@lightnlue: LightBlue;
+@lightblue: LightBlue;
 @lightcoral: LightCoral;
 @lightgreen: LightGreen;
 @lightsteelblue: LightSteelBlue;
@@ -92,7 +94,7 @@ html, body
 
 			tr
 			{
-				height: 32px;
+				height: @tr-height;
 			}
 
 			th
@@ -108,6 +110,16 @@ html, body
 
 			td.project
 			{
+				cursor: pointer;
+				position: relative;
+				text-decoration: underline;
+				color: #fff;
+
+				&:hover
+				{
+					text-decoration: none;
+				}
+
 				&.mediumaquamarine {background: @mediumaquamarine;}
 				&.mediumorchid {background: @mediumorchid;}
 				&.mediumpurple {background: @mediumpurple;}
@@ -117,18 +129,54 @@ html, body
 				&.mediumturquoise {background: @mediumturquoise;}
 				&.mediumvioletred {background: @mediumvioletred;}
 				&.violet {background: @violet;}
+
+				.project-select2
+				{
+					position: absolute;
+					left: -50%;
+					top: 3px;
+					padding: 1px 10px;
+					background: khaki;
+					border-radius: 5px;
+					border: 1px solid darkgray;
+				}
 			}
 
-			td 
+			td .tags 
 			{
+				cursor: pointer;
+				position: relative;
+				height: @tr-height;
+
+				.tags-select2
+				{
+					position: absolute;
+					left: 0;
+					top: 0;
+					padding: 1px 10px;
+					background: khaki;
+					border-radius: 5px;
+					border: 1px solid darkgray;
+					width: 100%;
+					z-index: 1;
+				}
+
+
+				&:hover
+				{
+					background: plum;
+				}
+
 				span.tag 
 				{
 					border-radius: 5px;
 					padding: 2px 8px;
 					margin: 0 3px;
 					color: #fff;
+					display: inline-block;
+					margin-top: 7px;
 
-					&.lightnlue {background: @lightnlue;}
+					&.lightblue {background: @lightblue;}
 					&.lightcoral {background: @lightcoral;}
 					&.lightgreen {background: @lightgreen;}
 					&.lightsteelblue {background: @lightsteelblue;}
@@ -139,10 +187,6 @@ html, body
 					&.lightgray {background: @lightgray;}
 				}
 
-				&.project
-				{
-					color: #fff;
-				}
 			}
 		}
 
