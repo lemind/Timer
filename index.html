@@ -74,7 +74,9 @@
 		        <td><%= task.get('desc') %></td>
 		        <td><%= task.get('time_str') %></td>
 		        <td><%= task.get('time') %></td>
-		        <td class="project <%= colors['projects'][projects.get(task.get('project_id')).get('color')] %>"><%= projects.get(task.get('project_id')).get('name') %></td>
+		        <td class="project">
+		        	<div class="name <%= colors['projects'][projects.get(task.get('project_id')).get('color')] %>" task_id="<%= task.get('id') %>"><%= projects.get(task.get('project_id')).get('name') %></div>
+		        </td>
 		        <td><button type="submit" class="btn start btn-default">Start</button></td>
 		        <td><button type="submit" class="btn delete btn-default">Delete</button></td>
 		        <td>

@@ -110,35 +110,40 @@ html, body
 
 			td.project
 			{
-				cursor: pointer;
 				position: relative;
-				text-decoration: underline;
-				color: #fff;
 
-				&:hover
-				{
-					text-decoration: none;
+				.name 
+				{	
+					cursor: pointer;
+					padding: 6px 10px;
+					color: #fff;
+
+					&:hover
+					{
+						opacity: .7;
+					}
+
+					&.mediumaquamarine {background: @mediumaquamarine;}
+					&.mediumorchid {background: @mediumorchid;}
+					&.mediumpurple {background: @mediumpurple;}
+					&.mediumseagreen {background: @mediumseagreen;}
+					&.mediumslateblue {background: @mediumslateblue;}
+					&.mediumspringgreen {background: @mediumspringgreen;}
+					&.mediumturquoise {background: @mediumturquoise;}
+					&.mediumvioletred {background: @mediumvioletred;}
+					&.violet {background: @violet;}
 				}
-
-				&.mediumaquamarine {background: @mediumaquamarine;}
-				&.mediumorchid {background: @mediumorchid;}
-				&.mediumpurple {background: @mediumpurple;}
-				&.mediumseagreen {background: @mediumseagreen;}
-				&.mediumslateblue {background: @mediumslateblue;}
-				&.mediumspringgreen {background: @mediumspringgreen;}
-				&.mediumturquoise {background: @mediumturquoise;}
-				&.mediumvioletred {background: @mediumvioletred;}
-				&.violet {background: @violet;}
 
 				.project-select2
 				{
 					position: absolute;
 					left: -50%;
 					top: 3px;
-					padding: 1px 10px;
+					padding: 2px 10px;
 					background: khaki;
 					border-radius: 5px;
 					border: 1px solid darkgray;
+					margin-left: 16px;
 				}
 			}
 

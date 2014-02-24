@@ -11,19 +11,37 @@ $(function(){
 		tasks = new Tasks(),
 		tags = new Tags(),
 
-		timer = 			$("#timer"),
-		select2_projects = 	$("#projects"),
-		select2_tags = 		$("#tags"),
-		main_time = 		$("span.time"),
-		input_task_name = 	$("input.task"),
-		main_button_start = $(".main button.start")
-		main_button_stop = 	(function() { return $(".main button.stop"); }),
-		main_button_pause = $(".main button.pause");
+		timer = 				$("#timer"),
+		main_select2_projects = $("#projects"),
+		main_select2_tags = 	$("#tags"),
+		main_time = 			$("span.time"),
+		input_task_name = 		$("input.task"),
+		main_button_start = 	$(".main button.start")
+		main_button_stop = 		(function() { return $(".main button.stop"); }),
+		main_button_pause = 	$(".main button.pause"),
+		project_select2 = 		$(".project-select2");
+		project_select2_str = 	'project-select2';
+
+ 		project_select2_params = {
+			placeholder: "Select project",
+			quietMillis: 100,
+			data: function() { return {results: projects.toJSON()}; },
+			formatResult: function(post) {
+				return post.name;
+			},
+			formatSelection: function(post) {
+				return post.name;
+			},
+		    createSearchChoice: function (term) {
+		        return { id: 0, name: term };
+		    }
+		};
 
 	$('html').click(function() {
 		console.log('all popups remove');
-		if ($(".project-select2").select2('data').length > 0) {
-			$(".project-select2").remove();
+
+		if ($("." + project_select2_str).select2('data')) {
+			$("." + project_select2_str).remove();
 		}
 
 		if ($(".tags-select2").select2('data').length > 0) {
@@ -31,6 +49,38 @@ $(function(){
 			$(".tags-select2").remove();
 		}
 	});
+
+	function task_update (id, arg, cb) {
+		var task = tasks.get(id);
+
+		task.set(arg).save(null, {
+		    success: function (model, response) {
+		    	cb.call();
+				console.log('task update');
+		    },
+		    error: function (model, response) {
+		        console.log("error: task update");
+		    }
+		});
+	}
+
+	function create_project (name) {
+			var new_project = new Project({
+			name: name,
+			color: Math.floor(Math.random() * 9)
+		});
+
+		new_project.save(null, {
+		    success: function (model, response) {
+		    	projects.add(new Project(response));
+
+		        last_new_project = response;
+		    },
+		    error: function (model, response) {
+		        console.log("error: save new project");
+		    }
+		});
+	 }
 
 	function task_tags_update(task_id, selected_tags) {
 
@@ -66,39 +116,9 @@ $(function(){
 		    success: function (model, response) {
 		        console.log("projects fetch success");
 
-				select2_projects.select2({
-					placeholder: "Select project",
-					quietMillis: 100,
-					data: function() { return {results: projects.toJSON()}; },
-					formatResult: function(post) {
-						return post.name;
-					},
-					formatSelection: function(post) {
-						return post.name;
-					},
-				    createSearchChoice: function (term) {
-				        return { id: 0, name: term };
-				    }
-				}).on("select2-selecting", function(e) {
+				main_select2_projects.select2(project_select2_params).on("select2-selecting", function(e) {
 
-					if (e.val == 0) {
-
-						var new_project = new Project({
-							name: e.object.name,
-							color: Math.floor(Math.random() * 9)
-						});
-
-						new_project.save(null, {
-						    success: function (model, response) {
-						    	projects.add(new Project(response));
-
-						        last_new_project = response;
-						    },
-						    error: function (model, response) {
-						        console.log("error: save new project");
-						    }
-						});
-					}
+					e.val == 0 && create_project(e.object.name);
 
 				});
 
@@ -116,7 +136,7 @@ $(function(){
 		    success: function (model, response) {
 		        console.log("tags fetch success");
 
-				select2_tags.select2({
+				main_select2_tags.select2({
 					placeholder: "Select tags",
 					quietMillis: 100,
 					multiple: true,
@@ -190,8 +210,8 @@ $(function(){
 
 		input_task_name.val('');
 		main_time.text('');
-		select2_projects.select2('data', '');
-		select2_tags.select2('data', '');
+		main_select2_projects.select2('data', '');
+		main_select2_tags.select2('data', '');
 
 		time = null;
 		time_str = '';
@@ -242,7 +262,7 @@ $(function(){
 		},		
 		start: function () {
 
-			!select2_projects.select2('data') && select2_projects.select2('data', {id: 1, name: 'no project'});
+			!main_select2_projects.select2('data') && main_select2_projects.select2('data', {id: 1, name: 'no project'});
 
 			main_button_start
 				.text('Stop')
@@ -256,8 +276,8 @@ $(function(){
 		},
 		stop: function () {
 
-			var selected_project = select2_projects.select2('data');
-			var selected_tags = select2_tags.select2('data');
+			var selected_project = main_select2_projects.select2('data');
+			var selected_tags = main_select2_tags.select2('data');
 			var tags_ids_arr = [];
 
 			selected_tags.forEach(function(tag) {
@@ -301,20 +321,17 @@ $(function(){
 				});
 
 			} else {
-				tasks.get(current_task_id).set({
-					time: 			time,
-					time_str: 		time_str,
-					project_id:		selected_project.id,
-					desc: 			input_task_name.val(),
-					tags:			tags_ids_arr.join()
-				}).save(null, {
-				    success: function (model, response) {
-						after_task_save();
-				    },
-				    error: function (model, response) {
-				        console.log("error: task save");
-				    }
-				});
+				task_update(
+					current_task_id, 
+					{
+						time: 			time,
+						time_str: 		time_str,
+						project_id:		selected_project.id,
+						desc: 			input_task_name.val(),
+						tags:			tags_ids_arr.join()
+					},
+					after_task_save
+				);
 			}
 
 		},
@@ -353,7 +370,7 @@ $(function(){
 				$(".task" + current_task_id + ' .start').remove();
 
 				input_task_name.val(task.get('desc'));
-				select2_projects.select2('data', {id: task.get('project_id'), name: projects.get(task.get('project_id')).get('name')});
+				main_select2_projects.select2('data', {id: task.get('project_id'), name: projects.get(task.get('project_id')).get('name')});
 
 				if (task.get('tags')) {
 					tags_ids = task.get('tags').split(',');
@@ -362,7 +379,7 @@ $(function(){
 						current_task_tags.push(tags.get(id).toJSON());
 					});
 
-					select2_tags.select2("data", current_task_tags);
+					main_select2_tags.select2("data", current_task_tags);
 				}
 
 				timer_start(task.get('time'));
@@ -394,74 +411,36 @@ $(function(){
 		},
 		edit_project: function (ev) {
 			ev.stopPropagation();
-			$(".project-select2").remove();
 
-			var el_task_line = $(ev.target).parent();
+			$("." + project_select2_str).remove();
 
-			selected_task_id = el_task_line.attr("id");			
+			var el_task_line = $(ev.target);
 
-			var task = tasks.get(selected_task_id);
+			selected_task_id = el_task_line.attr("task_id");			
 
-			$(ev.target).append('<div class="project-select2"></div>');
+			var task_project_id = tasks.get(selected_task_id).get('project_id');
 
-			$(".project-select2").select2({
-				placeholder: "Select project",
-				quietMillis: 100,
-				data: function() { return {results: projects.toJSON()}; },
-				formatResult: function(post) {
-					return post.name;
-				},
-				formatSelection: function(post) {
-					return post.name;
-				},
-			    createSearchChoice: function (term) {
-			        return { id: 0, name: term };
-			    }
-			}).on("select2-selecting", function(e) {
+			el_task_line.parent().append('<div class="' + project_select2_str + '"></div>');
+
+			$("." + project_select2_str).select2(project_select2_params).on("select2-selecting", function(e) {
 
 				var selected_project = e.object;
 
-				if (e.val == 0) {
-
-					var new_project = new Project({
-						name: e.object.name,
-						color: Math.floor(Math.random() * 9)
-					});
-
-					new_project.save(null, {
-					    success: function (model, response) {
-					    	projects.add(new Project(response));
-
-					        last_new_project = response;
-					    },
-					    error: function (model, response) {
-					        console.log("error: save new project");
-					    }
-					});
-				}
+				e.val == 0 && create_project(e.object.name);
 
 				setTimeout(function() {
 					selected_project.id == 0 ? selected_project = last_new_project : selected_project;
 
-					task.set({
-						project_id:	selected_project.id
-					}).save(null, {
-					    success: function (model, response) {
-							console.log('task project update');
-					    },
-					    error: function (model, response) {
-					        console.log("error: task project update");
-					    }
-					});
+					task_update(selected_task_id, {project_id: selected_project.id});
 
-					$(".task" + selected_task_id + " .project-select2").remove();
+					$(".task" + selected_task_id + " ." + project_select2_str).remove();
 
 					var taskListView = new TaskListView({tasks: tasks, projects: projects, tags: tags});
 				}, 200);
 
 			});
 
-			$(".task" + selected_task_id + " .project-select2").select2('data', {id: task.get('project_id'), name: projects.get(task.get('project_id')).get('name')});
+			$(".task" + selected_task_id + " ." + project_select2_str).select2('data', {id: task_project_id, name: projects.get(task_project_id).get('name')});
 
 		},
 		edit_tags: function (ev) {
