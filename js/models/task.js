@@ -9,10 +9,11 @@ window.Tasks = Backbone.Collection.extend({
 	initialize: function() { 
 
 		this.on('change:tags', this.changeTags, this);
+		this.on('add', this.changeTags, this);
 
 	},
 
-	changeTags: function(model, val, options) { 
+	changeTags: function(model) { 
 
 		if (model.get('tags')) {
 			var tags_ids_arr = $.map(model.get('tags').split(','), function(val){

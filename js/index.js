@@ -55,7 +55,7 @@ $(function(){
 
 		task.set(arg).save(null, {
 		    success: function (model, response) {
-		    	cb.call();
+		    	typeof cb == "function" && cb.call();
 				console.log('task update');
 		    },
 		    error: function (model, response) {
@@ -196,7 +196,7 @@ $(function(){
 
 	}
 
-	function after_task_save () {
+	function reset_variables () {
 
 		main_button_stop.call()
 			.text('Start')
@@ -216,6 +216,8 @@ $(function(){
 		time = null;
 		time_str = '';
 		timer_status = 0;
+
+		console.log('reset_variables');
 
 	}
 
@@ -239,17 +241,6 @@ $(function(){
 					projects_select2_init();
 					tags_select2_init();
 
-					//todo move to model
-					tasks.forEach(function(task) {
-						if (task.get('tags')) {
-							var tags_ids_arr = $.map(task.get('tags').split(','), function(val){
-							    return parseInt(val);
-							});
-
-							tasks.get(task.id).set({'tags_ids_arr': tags_ids_arr});
-						}
-					});
-					
 					setTimeout(function() {
 						var taskListView = new TaskListView({tasks: tasks, projects: projects, tags: tags});
 					}, 200);
@@ -295,30 +286,20 @@ $(function(){
 
 			if (current_task_id == 0) {
 
-				var new_task = new Task({
-					time: 			time, 
-					time_str: 		time_str, 
-					project_id:		selected_project.id, 
-					desc: 			input_task_name.val(),
-					tags:			tags_ids_arr.join()
-				});
-
-				new_task.save(null, {
-				    success: function (model, response) {
-						var tags_ids_arr = $.map(response.tags.split(','), function(val){
-							return parseInt(val);
-						});
-
-						response.tags_ids_arr = tags_ids_arr;
-
-				    	tasks.add(new Task(response));
-
-						after_task_save();
-				    },
-				    error: function (model, response) {
-				        console.log("error: new task save");
-				    }
-				});
+				tasks.create(new Task({
+						time: 			time, 
+						time_str: 		time_str, 
+						project_id:		selected_project.id, 
+						desc: 			input_task_name.val(),
+						tags:			tags_ids_arr.join()
+					}), { 
+						success: function (model, response) {
+							reset_variables();
+						},
+						error: function (model, response) {
+							console.log("error: new task save");
+						}
+					});
 
 			} else {
 				task_update(
@@ -330,7 +311,7 @@ $(function(){
 						desc: 			input_task_name.val(),
 						tags:			tags_ids_arr.join()
 					},
-					after_task_save
+					reset_variables
 				);
 			}
 
