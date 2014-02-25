@@ -48,6 +48,7 @@ $app->get(
             $db = getConnection();
 
             $sql = "select * from tasks";
+            //$sql = "select * from tasks order by `id` desc";
             $stmt = $db->prepare($sql);
             $stmt->execute();
 
@@ -75,14 +76,15 @@ $app->post(
         {
             $db = getConnection();
 
-            $sql = "insert into tasks (`time`, `time_str`,`desc`, `project_id`, `tags`) values(?, ?, ?, ?, ?)";
+            $sql = "insert into tasks (`time`, `time_str`,`desc`, `project_id`, `tags`, `date`) values(?, ?, ?, ?, ?, ?)";
             $stmt = $db->prepare($sql);
             $stmt->execute(array(
                 $data->time,
                 $data->time_str,
                 $data->desc,
                 $data->project_id,
-                $data->tags
+                $data->tags,
+                $data->date
             ));
             $data->id = $db->lastInsertId();
 

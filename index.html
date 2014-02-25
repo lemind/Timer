@@ -59,6 +59,7 @@
 		<table>
 		  <thead>
 		    <tr>
+		      <th>Date</th>
 		      <th>Desc</th>
 		      <th>Time</th>
 		      <th>Time / ms</th>
@@ -69,8 +70,9 @@
 		    </tr>
 		  </thead>
 		  <tbody>
-		    <% _.each(tasks, function(task) { %>
-		      <tr class="task<%= task.get('id') %>" id="<%= task.get('id') %>">
+		    <% _.each(tasks.reverse(), function(task) { %>
+		      <tr class="task task<%= task.get('id') %>" id="<%= task.get('id') %>">
+		        <td><%= task.get('date') %></td>
 		        <td><%= task.get('desc') %></td>
 		        <td><%= task.get('time_str') %></td>
 		        <td><%= task.get('time') %></td>
@@ -90,6 +92,7 @@
 
 		      </tr>
 		    <% }); %>
+		    <% tasks.reverse(); %>
 		  </tbody>
 		</table>
 		</script>

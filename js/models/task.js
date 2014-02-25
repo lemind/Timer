@@ -14,9 +14,10 @@ window.Tasks = Backbone.Collection.extend({
 	},
 
 	changeTags: function(model) { 
+		var tags_ids_arr = [];
 
 		if (model.get('tags')) {
-			var tags_ids_arr = $.map(model.get('tags').split(','), function(val){
+			tags_ids_arr = $.map(model.get('tags').split(','), function(val){
 				return parseInt(val);
 			});
 

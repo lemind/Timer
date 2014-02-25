@@ -17,3 +17,15 @@ function msToTime(s) {
 		return secs;
 	}
 }
+
+function getCurrentDate() {
+	var	today = new Date(),
+		dd = today.getDate(),
+		mm = today.getMonth() + 1,
+		yyyy = today.getFullYear();
+
+	dd = dd < 10 ? '0' + dd : dd;
+	mm = mm < 10 ? '0' + mm : dd;
+	
+	return yyyy + '-' + mm + '-' + dd;
+}

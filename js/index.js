@@ -54,8 +54,6 @@ $(function(){
 		};
 
 	$('html').click(function() {
-		console.log('all popups remove');
-
 		if ($("." + project_select2_str).length > 0) {
 			$("." + project_select2_str).remove();
 		}
@@ -214,9 +212,6 @@ $(function(){
 		time = null;
 		time_str = '';
 		timer_status = 0;
-
-		console.log('reset_variables');
-
 	}
 
 	var Timer = Backbone.View.extend({
@@ -265,9 +260,9 @@ $(function(){
 		},
 		stop: function () {
 
-			var selected_project = main_select2_projects.select2('data');
-			var selected_tags = main_select2_tags.select2('data');
-			var tags_ids_arr = [];
+			var selected_project = main_select2_projects.select2('data'),
+				selected_tags = main_select2_tags.select2('data'),
+				tags_ids_arr = [];
 
 			selected_tags.forEach(function(tag) {
 				if (tag.fl != 'new') tags_ids_arr.push(tag.id);
@@ -282,6 +277,8 @@ $(function(){
 
 			selected_project.id == 0 ? selected_project = last_new_project : selected_project;
 
+//console.log(tasks.get(current_task_id).get('date'));
+
 			if (current_task_id == 0) {
 
 				tasks.create(new Task({
@@ -289,7 +286,8 @@ $(function(){
 						time_str: 		time_str, 
 						project_id:		selected_project.id, 
 						desc: 			input_task_name.val(),
-						tags:			tags_ids_arr.join()
+						tags:			tags_ids_arr.join(),
+						date:			getCurrentDate()
 					}), { 
 						success: function (model, response) {
 							reset_variables();
@@ -326,17 +324,17 @@ $(function(){
 		old_task_start: function (ev) {
 
 			var tags_ids = [],
-				current_task_tags = [];
+				current_task_tags = [],
+				el_task_line,
+				task;
 
 			timer_status && this.stop();
 
-			var el_task_line = $(ev.target).parent().parent();
-
-			el_task_line.css('background-color', 'khaki');
+			el_task_line = $(ev.target).parents('.task');
 
 			current_task_id = el_task_line.attr("id");
 
-			var task = tasks.get(current_task_id);
+			task = tasks.get(current_task_id);
 
 			// set data new started task after current task stop
 			setTimeout(function() {
@@ -344,9 +342,6 @@ $(function(){
 					.text('Stop')
 					.addClass('stop')
 					.removeClass('start');
-
-				$(".task" + current_task_id).css('background-color', 'khaki');
-				$(".task" + current_task_id + ' .start').remove();
 
 				input_task_name.val(task.get('desc'));
 				main_select2_projects.select2('data', {id: task.get('project_id'), name: projects.get(task.get('project_id')).get('name')});
@@ -361,7 +356,15 @@ $(function(){
 					main_select2_tags.select2("data", current_task_tags);
 				}
 
-				timer_start(task.get('time'));
+				if (getCurrentDate() > task.get('date')) {
+					current_task_id = 0;
+					timer_start();
+				} else {
+					$(".task" + current_task_id).css('background-color', 'khaki');
+					$(".task" + current_task_id + ' .start').remove();
+					timer_start(task.get('time'));					
+				}
+
 			}, 200);
 
 		},		
