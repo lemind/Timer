@@ -19,8 +19,8 @@ $(function(){
 		main_button_start = 	$(".main button.start")
 		main_button_stop = 		(function() { return $(".main button.stop"); }),
 		main_button_pause = 	$(".main button.pause"),
-		project_select2 = 		$(".project-select2");
-		project_select2_str = 	'project-select2';
+		project_select2_str = 	'project-select2',
+		tags_select2 = 			'tags-select2',
 
  		project_select2_params = {
 			placeholder: "Select project",
@@ -35,19 +35,32 @@ $(function(){
 		    createSearchChoice: function (term) {
 		        return { id: 0, name: term };
 		    }
+		},
+
+		tags_select2_params = {
+			placeholder: "Select tags",
+			quietMillis: 100,
+			multiple: true,
+			data: function() { return {results: tags.toJSON()}; },
+			formatResult: function(post) {
+				return post.name;
+			},
+			formatSelection: function(post) {
+				return post.name;
+			},
+		    createSearchChoice: function (term) {
+		        return { id: term, name: term, fl: 'new' };
+		    }
 		};
 
 	$('html').click(function() {
 		console.log('all popups remove');
 
-		if ($("." + project_select2_str).select2('data')) {
+		if ($("." + project_select2_str).length > 0) {
 			$("." + project_select2_str).remove();
 		}
 
-		if ($(".tags-select2").select2('data').length > 0) {
-			task_tags_update($(".tags-select2").parent().attr("task_id"), $(".tags-select2").select2('data'));
-			$(".tags-select2").remove();
-		}
+		$("." + tags_select2).length > 0 && task_tags_update($("." + tags_select2).parent().attr("task_id"), $("." + tags_select2).select2('data'));
 	});
 
 	function task_update (id, arg, cb) {
@@ -65,15 +78,14 @@ $(function(){
 	}
 
 	function create_project (name) {
-			var new_project = new Project({
-			name: name,
-			color: Math.floor(Math.random() * 9)
-		});
+		var new_project = new Project({
+				name: name,
+				color: Math.floor(Math.random() * 9)
+			});
 
 		new_project.save(null, {
 		    success: function (model, response) {
 		    	projects.add(new Project(response));
-
 		        last_new_project = response;
 		    },
 		    error: function (model, response) {
@@ -82,31 +94,53 @@ $(function(){
 		});
 	 }
 
+	 function create_tag (name) {
+		var new_tag = new Tag({
+			name: name,
+			color: Math.floor(Math.random() * 9)
+		});
+
+		new_tag.save(null, {
+		    success: function (model, response) {
+		    	tags.add(new Tag(response));
+		    	last_new_tags.push(response.id);
+		    },
+		    error: function (model, response) {
+		        console.log("error: save new tag");
+		    }
+		});
+	 }
+
 	function task_tags_update(task_id, selected_tags) {
 
 		var tags_ids_arr = [];
 
-		selected_tags.forEach(function(tag) {
-			if (tag.fl != 'new') tags_ids_arr.push(tag.id);
-		});
+		$("." + tags_select2).remove();
+
+		if (selected_tags.length > 0) {
+			selected_tags.forEach(function(tag) {
+				if (tag.fl != 'new') tags_ids_arr.push(tag.id);
+			});
+		}
 
 		if (last_new_tags.length) {
 			tags_ids_arr = tags_ids_arr.concat(last_new_tags);	
 			last_new_tags = [];
 		}
 
-		tasks.get(task_id).set({
-			tags: tags_ids_arr.join()
-		}).save(null, {
-		    success: function (model, response) {
-				console.log('task / tags update success');
-				console.log(response);
-				var taskListView = new TaskListView({tasks: tasks, projects: projects, tags: tags});
-		    },
-		    error: function (model, response) {
-		        console.log("error: task save");
-		    }
-		});
+		if (task_id)
+			tasks.get(task_id).set({
+				tags: tags_ids_arr.join()
+			}).save(null, {
+			    success: function (model, response) {
+					console.log('task / tags update success');
+					console.log(response);
+					var taskListView = new TaskListView({tasks: tasks, projects: projects, tags: tags});
+			    },
+			    error: function (model, response) {
+			        console.log("error: task save");
+			    }
+			});
 
 	};
 
@@ -136,39 +170,9 @@ $(function(){
 		    success: function (model, response) {
 		        console.log("tags fetch success");
 
-				main_select2_tags.select2({
-					placeholder: "Select tags",
-					quietMillis: 100,
-					multiple: true,
-					data: function() { return {results: tags.toJSON()}; },
-					formatResult: function(post) {
-						return post.name;
-					},
-					formatSelection: function(post) {
-						return post.name;
-					},
-				    createSearchChoice: function (term) {
-				        return { id: term, name: term, fl: 'new' };
-				    }
-				}).on("select2-selecting", function(e) {
+				main_select2_tags.select2(tags_select2_params).on("select2-selecting", function(e) {
 
-					if (e.object.fl == 'new') {
-
-						var new_tag = new Tag({
-							name: e.object.name,
-							color: Math.floor(Math.random() * 9)
-						});
-
-						new_tag.save(null, {
-						    success: function (model, response) {
-						    	tags.add(new Tag(response));
-						    	last_new_tags.push(response.id);
-						    },
-						    error: function (model, response) {
-						        console.log("error: save new tag");
-						    }
-						});
-					}
+					e.object.fl == 'new' && create_tag(e.object.name);
 
 				});
 
@@ -426,57 +430,22 @@ $(function(){
 		},
 		edit_tags: function (ev) {
 			ev.stopPropagation();
-			$(".tags-select2").remove();
+
+			$("." + tags_select2).length > 0 && task_tags_update($("." + tags_select2).parent().attr("task_id"), $("." + tags_select2).select2('data'));			
 
 			var tags_ids = [],
 				current_task_tags = [];
 
-			var el_task_line = $(ev.target);
+			var el_task_line = $(ev.target).hasClass("tags") ? $(ev.target) : $(ev.target).parents('.tags');
 
-			//todo fix it
-			if (el_task_line.attr("task_id")) {
-				selected_task_id = el_task_line.attr("task_id");
-				el_task_line.append('<div class="tags-select2"></div>');
-			} else {
-				selected_task_id = el_task_line.parent().attr("task_id");
-				el_task_line.parent().append('<div class="tags-select2"></div>');
-			}
+			selected_task_id = el_task_line.attr("task_id");
+			el_task_line.append('<div class="' + tags_select2 + '"></div>');
 
 			var task = tasks.get(selected_task_id);
 
-			$(".tags-select2").select2({
-				placeholder: "Select tags",
-				quietMillis: 100,
-				multiple: true,
-				data: function() { return {results: tags.toJSON()}; },
-				formatResult: function(post) {
-					return post.name;
-				},
-				formatSelection: function(post) {
-					return post.name;
-				},
-			    createSearchChoice: function (term) {
-			        return { id: term, name: term, fl: 'new' };
-			    }
-			}).on("select2-selecting", function(e) {
+			$("." + tags_select2).select2(tags_select2_params).on("select2-selecting", function(e) {
 
-				if (e.object.fl == 'new') {
-
-					var new_tag = new Tag({
-						name: e.object.name,
-						color: Math.floor(Math.random() * 9)
-					});
-
-					new_tag.save(null, {
-					    success: function (model, response) {
-					    	tags.add(new Tag(response));
-					    	last_new_tags.push(response.id);
-					    },
-					    error: function (model, response) {
-					        console.log("error: save new tag");
-					    }
-					});
-				}
+				e.object.fl == 'new' && create_tag(e.object.name);
 
 			});
 
@@ -488,7 +457,7 @@ $(function(){
 					current_task_tags.push(tags.get(id).toJSON());
 				});
 
-				$(".task" + selected_task_id + " .tags-select2").select2("data", current_task_tags);
+				$(".task" + selected_task_id + " ." + tags_select2).select2("data", current_task_tags);
 			}
 
 		}
