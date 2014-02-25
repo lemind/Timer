@@ -21,6 +21,7 @@ $(function(){
 		main_button_pause = 	$(".main button.pause"),
 		project_select2_str = 	'project-select2',
 		tags_select2 = 			'tags-select2',
+		input_desc = 			'input_desc',
 
  		project_select2_params = {
 			placeholder: "Select project",
@@ -59,6 +60,8 @@ $(function(){
 		}
 
 		$("." + tags_select2).length > 0 && task_tags_update($("." + tags_select2).parent().attr("task_id"), $("." + tags_select2).select2('data'));
+
+		$("." + input_desc).length > 0 && task_desc_update($("." + input_desc).parents(".task").attr("id"), $("." + input_desc + " input").val());
 	});
 
 	function task_update (id, arg, cb) {
@@ -133,6 +136,14 @@ $(function(){
 
 		if (task_id)
 			task_update(task_id, {tags: tags_ids_arr.join()}, task_view_render);
+
+	};
+
+	function task_desc_update(task_id, new_desc) {
+
+		$("." + input_desc).remove();
+
+		task_update(task_id, {desc: new_desc}, task_view_render);
 
 	};
 
@@ -223,7 +234,8 @@ $(function(){
 			"click .tasks .start": 		"old_task_start",
 			"click .tasks .delete":		"delete_task",
 			"click .tasks .project":	"edit_project",
-			"click .tasks .tags":		"edit_tags" 
+			"click .tasks .tags":		"edit_tags",
+			"click .tasks .desc":		"editDesc" 
 		},
 		initialize: function() {
 
@@ -276,8 +288,6 @@ $(function(){
 			clearInterval(interval);
 
 			selected_project.id == 0 ? selected_project = last_new_project : selected_project;
-
-//console.log(tasks.get(current_task_id).get('date'));
 
 			if (current_task_id == 0) {
 
@@ -392,15 +402,17 @@ $(function(){
 
 		},
 		edit_project: function (ev) {
+
+			var el_task_line = $(ev.target),
+				task_project_id;
+
 			ev.stopPropagation();
 
 			$("." + project_select2_str).remove();
 
-			var el_task_line = $(ev.target);
-
 			selected_task_id = el_task_line.attr("task_id");			
 
-			var task_project_id = tasks.get(selected_task_id).get('project_id');
+			task_project_id = tasks.get(selected_task_id).get('project_id');
 
 			el_task_line.parent().append('<div class="' + project_select2_str + '"></div>');
 
@@ -426,19 +438,22 @@ $(function(){
 
 		},
 		edit_tags: function (ev) {
+
+			var tags_ids = [],
+				current_task_tags = [],
+				el_task_line,
+				task;
+
 			ev.stopPropagation();
 
 			$("." + tags_select2).length > 0 && task_tags_update($("." + tags_select2).parent().attr("task_id"), $("." + tags_select2).select2('data'));			
 
-			var tags_ids = [],
-				current_task_tags = [];
-
-			var el_task_line = $(ev.target).hasClass("tags") ? $(ev.target) : $(ev.target).parents('.tags');
+			el_task_line = $(ev.target).hasClass("tags") ? $(ev.target) : $(ev.target).parents('.tags');
 
 			selected_task_id = el_task_line.attr("task_id");
 			el_task_line.append('<div class="' + tags_select2 + '"></div>');
 
-			var task = tasks.get(selected_task_id);
+			task = tasks.get(selected_task_id);
 
 			$("." + tags_select2).select2(tags_select2_params).on("select2-selecting", function(e) {
 
@@ -456,6 +471,26 @@ $(function(){
 
 				$(".task" + selected_task_id + " ." + tags_select2).select2("data", current_task_tags);
 			}
+
+		},
+		editDesc: function (ev) {
+
+			var el_task_line = $(ev.target),
+				task;
+
+			ev.stopPropagation();
+
+			$("." + input_desc).length > 0 && task_desc_update($("." + input_desc).parents(".task").attr("id"), $("." + input_desc + " input").val());
+
+			selected_task_id = el_task_line.parents('.task').attr("id");
+
+			task = tasks.get(selected_task_id);
+
+			el_task_line.parent().append('<div class="' + input_desc + '"><input></div>');
+
+			$("." + input_desc).click(function(ev) { ev.stopPropagation(); });
+
+			$(".task" + selected_task_id + " ." + input_desc + " input").val(task.get('desc'));
 
 		}
 

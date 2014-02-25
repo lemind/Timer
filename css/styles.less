@@ -51,7 +51,7 @@
 @mediumvioletred: MediumVioletRed;
 @violet: Violet;
 
-html, body 
+html { body 
 {
 	height: 100%;
 	font-family: 'Open Sans', sans-serif;
@@ -106,6 +106,46 @@ html, body
 			{
 				text-align: center;
 				white-space: nowrap;
+
+				&.desc
+				{
+					position: relative;
+
+					.name
+					{
+						padding: 6px 0px;
+						box-sizing: border-box;
+						margin: 3px 0;
+						cursor: pointer;
+						border-radius: 5px;
+
+						&:hover
+						{
+							background: SandyBrown;
+							color: #fff;
+						}
+					}
+
+					.input_desc
+					{
+						width: 100%;
+						position: absolute;
+						top: 4px;
+						background: khaki;
+						padding: 3px 10px;
+						box-sizing: border-box;
+						border-radius: 5px;
+						left: 0;
+						border: 1px solid darkgray;
+
+						input
+						{
+							width: 100%;
+							padding: 0 3px;
+							box-sizing: border-box;
+						}
+					}
+				}
 			}
 
 			td.project
@@ -117,6 +157,7 @@ html, body
 					cursor: pointer;
 					padding: 6px 10px;
 					color: #fff;
+					border-radius: 5px;
 
 					&:hover
 					{
@@ -152,6 +193,7 @@ html, body
 				cursor: pointer;
 				position: relative;
 				height: @tr-height;
+				border-radius: 5px;
 
 				.tags-select2
 				{
@@ -219,7 +261,7 @@ html, body
 
 	/* Footer - end */
 
-}
+}}
 
  /* Landscape - telefony */
 @media (max-width: 480px) {  }

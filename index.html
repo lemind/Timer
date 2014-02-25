@@ -73,7 +73,7 @@
 		    <% _.each(tasks.reverse(), function(task) { %>
 		      <tr class="task task<%= task.get('id') %>" id="<%= task.get('id') %>">
 		        <td><%= task.get('date') %></td>
-		        <td><%= task.get('desc') %></td>
+		        <td class="desc"><div class="name"><%= task.get('desc') %></div></td>
 		        <td><%= task.get('time_str') %></td>
 		        <td><%= task.get('time') %></td>
 		        <td class="project">
