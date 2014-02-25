@@ -75,6 +75,11 @@ $(function(){
 		        console.log("error: task update");
 		    }
 		});
+	}	
+
+	//todo fix this
+	function task_view_render () {
+		var taskListView = new TaskListView({tasks: tasks, projects: projects, tags: tags});
 	}
 
 	function create_project (name) {
@@ -129,18 +134,7 @@ $(function(){
 		}
 
 		if (task_id)
-			tasks.get(task_id).set({
-				tags: tags_ids_arr.join()
-			}).save(null, {
-			    success: function (model, response) {
-					console.log('task / tags update success');
-					console.log(response);
-					var taskListView = new TaskListView({tasks: tasks, projects: projects, tags: tags});
-			    },
-			    error: function (model, response) {
-			        console.log("error: task save");
-			    }
-			});
+			task_update(task_id, {tags: tags_ids_arr.join()}, task_view_render);
 
 	};
 
