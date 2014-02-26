@@ -59,12 +59,12 @@ $(function(){
 			$("." + project_select2_str).remove();
 		}
 
-		$("." + tags_select2).length > 0 && task_tags_update($("." + tags_select2).parent().attr("task_id"), $("." + tags_select2).select2('data'));
+		$("." + tags_select2).length > 0 && taskTagsUpdate($("." + tags_select2).parent().attr("task_id"), $("." + tags_select2).select2('data'));
 
-		$("." + input_desc).length > 0 && task_desc_update($("." + input_desc).parents(".task").attr("id"), $("." + input_desc + " input").val());
+		$("." + input_desc).length > 0 && taskDescUpdate($("." + input_desc).parents(".task").attr("id"), $("." + input_desc + " input").val());
 	});
 
-	function task_update (id, arg, cb) {
+	function taskUpdate (id, arg, cb) {
 		var task = tasks.get(id);
 
 		task.set(arg).save(null, {
@@ -79,11 +79,11 @@ $(function(){
 	}	
 
 	//todo fix this
-	function task_view_render () {
+	function taskViewRender () {
 		var taskListView = new TaskListView({tasks: tasks, projects: projects, tags: tags});
 	}
 
-	function create_project (name) {
+	function createProject (name) {
 		var new_project = new Project({
 				name: name,
 				color: Math.floor(Math.random() * 9)
@@ -100,11 +100,11 @@ $(function(){
 		});
 	 }
 
-	 function create_tag (name) {
+	 function createTag (name) {
 		var new_tag = new Tag({
-			name: name,
-			color: Math.floor(Math.random() * 9)
-		});
+				name: name,
+				color: Math.floor(Math.random() * 9)
+			});
 
 		new_tag.save(null, {
 		    success: function (model, response) {
@@ -117,7 +117,7 @@ $(function(){
 		});
 	 }
 
-	function task_tags_update(task_id, selected_tags) {
+	function taskTagsUpdate(task_id, selected_tags) {
 
 		var tags_ids_arr = [];
 
@@ -135,19 +135,19 @@ $(function(){
 		}
 
 		if (task_id)
-			task_update(task_id, {tags: tags_ids_arr.join()}, task_view_render);
+			taskUpdate(task_id, {tags: tags_ids_arr.join()}, taskViewRender);
 
 	};
 
-	function task_desc_update(task_id, new_desc) {
+	function taskDescUpdate(task_id, new_desc) {
 
 		$("." + input_desc).remove();
 
-		task_update(task_id, {desc: new_desc}, task_view_render);
+		taskUpdate(task_id, {desc: new_desc}, taskViewRender);
 
 	};
 
-	function projects_select2_init () {
+	function projectsSelect2Init () {
 
 		projects.fetch({
 		    success: function (model, response) {
@@ -155,7 +155,7 @@ $(function(){
 
 				main_select2_projects.select2(project_select2_params).on("select2-selecting", function(e) {
 
-					e.val == 0 && create_project(e.object.name);
+					e.val == 0 && createProject(e.object.name);
 
 				});
 
@@ -167,7 +167,7 @@ $(function(){
 
 	}
 
-	function tags_select2_init () {
+	function tagsSelect2Init () {
 
 		tags.fetch({
 		    success: function (model, response) {
@@ -175,7 +175,7 @@ $(function(){
 
 				main_select2_tags.select2(tags_select2_params).on("select2-selecting", function(e) {
 
-					e.object.fl == 'new' && create_tag(e.object.name);
+					e.object.fl == 'new' && createTag(e.object.name);
 
 				});
 
@@ -187,7 +187,7 @@ $(function(){
 
 	}
 
-	function timer_start(time_current) {
+	function timerStart(time_current) {
 
 		var start = new Date().getTime();
 
@@ -203,7 +203,7 @@ $(function(){
 
 	}
 
-	function reset_variables () {
+	function resetVariables () {
 
 		main_button_stop.call()
 			.text('Start')
@@ -231,10 +231,10 @@ $(function(){
 			"click .main .start": 		"start", 
 			"click .main .stop": 		"stop", 
 			"click .main .pause": 		"pause", 
-			"click .tasks .start": 		"old_task_start",
-			"click .tasks .delete":		"delete_task",
-			"click .tasks .project":	"edit_project",
-			"click .tasks .tags":		"edit_tags",
+			"click .tasks .start": 		"oldTaskStart",
+			"click .tasks .delete":		"deleteTask",
+			"click .tasks .project":	"editProject",
+			"click .tasks .tags":		"editTags",
 			"click .tasks .desc":		"editDesc" 
 		},
 		initialize: function() {
@@ -243,8 +243,8 @@ $(function(){
 			    success: function (model, response) {
 			        console.log("tasks fetch success");
 
-					projects_select2_init();
-					tags_select2_init();
+					projectsSelect2Init();
+					tagsSelect2Init();
 
 					setTimeout(function() {
 						var taskListView = new TaskListView({tasks: tasks, projects: projects, tags: tags});
@@ -267,7 +267,7 @@ $(function(){
 
 			current_task_id = 0;
 
-			timer_start();
+			timerStart();
 
 		},
 		stop: function () {
@@ -300,7 +300,7 @@ $(function(){
 						date:			getCurrentDate()
 					}), { 
 						success: function (model, response) {
-							reset_variables();
+							resetVariables();
 						},
 						error: function (model, response) {
 							console.log("error: new task save");
@@ -308,7 +308,7 @@ $(function(){
 					});
 
 			} else {
-				task_update(
+				taskUpdate(
 					current_task_id, 
 					{
 						time: 			time,
@@ -317,21 +317,21 @@ $(function(){
 						desc: 			input_task_name.val(),
 						tags:			tags_ids_arr.join()
 					},
-					reset_variables
+					resetVariables
 				);
 			}
 
 		},
 		pause: function () {
 
-			timer_status ? clearInterval(interval) : timer_start(time);
+			timer_status ? clearInterval(interval) : timerStart(time);
 
 			main_button_pause.toggleClass('active');
 
 			timer_status = !timer_status;
 
 		},
-		old_task_start: function (ev) {
+		oldTaskStart: function (ev) {
 
 			var tags_ids = [],
 				current_task_tags = [],
@@ -368,17 +368,17 @@ $(function(){
 
 				if (getCurrentDate() > task.get('date')) {
 					current_task_id = 0;
-					timer_start();
+					timerStart();
 				} else {
 					$(".task" + current_task_id).css('background-color', 'khaki');
 					$(".task" + current_task_id + ' .start').remove();
-					timer_start(task.get('time'));					
+					timerStart(task.get('time'));					
 				}
 
 			}, 200);
 
 		},		
-		delete_task: function (ev) {
+		deleteTask: function (ev) {
 
 			var el_task_line = $(ev.target).parent().parent();
 
@@ -401,7 +401,7 @@ $(function(){
 			}
 
 		},
-		edit_project: function (ev) {
+		editProject: function (ev) {
 
 			var el_task_line = $(ev.target),
 				task_project_id;
@@ -420,12 +420,12 @@ $(function(){
 
 				var selected_project = e.object;
 
-				e.val == 0 && create_project(e.object.name);
+				e.val == 0 && createProject(e.object.name);
 
 				setTimeout(function() {
 					selected_project.id == 0 ? selected_project = last_new_project : selected_project;
 
-					task_update(selected_task_id, {project_id: selected_project.id});
+					taskUpdate(selected_task_id, {project_id: selected_project.id});
 
 					$(".task" + selected_task_id + " ." + project_select2_str).remove();
 
@@ -437,7 +437,7 @@ $(function(){
 			$(".task" + selected_task_id + " ." + project_select2_str).select2('data', {id: task_project_id, name: projects.get(task_project_id).get('name')});
 
 		},
-		edit_tags: function (ev) {
+		editTags: function (ev) {
 
 			var tags_ids = [],
 				current_task_tags = [],
@@ -446,7 +446,7 @@ $(function(){
 
 			ev.stopPropagation();
 
-			$("." + tags_select2).length > 0 && task_tags_update($("." + tags_select2).parent().attr("task_id"), $("." + tags_select2).select2('data'));			
+			$("." + tags_select2).length > 0 && taskTagsUpdate($("." + tags_select2).parent().attr("task_id"), $("." + tags_select2).select2('data'));			
 
 			el_task_line = $(ev.target).hasClass("tags") ? $(ev.target) : $(ev.target).parents('.tags');
 
@@ -457,7 +457,7 @@ $(function(){
 
 			$("." + tags_select2).select2(tags_select2_params).on("select2-selecting", function(e) {
 
-				e.object.fl == 'new' && create_tag(e.object.name);
+				e.object.fl == 'new' && createTag(e.object.name);
 
 			});
 
@@ -480,7 +480,7 @@ $(function(){
 
 			ev.stopPropagation();
 
-			$("." + input_desc).length > 0 && task_desc_update($("." + input_desc).parents(".task").attr("id"), $("." + input_desc + " input").val());
+			$("." + input_desc).length > 0 && taskDescUpdate($("." + input_desc).parents(".task").attr("id"), $("." + input_desc + " input").val());
 
 			selected_task_id = el_task_line.parents('.task').attr("id");
 
