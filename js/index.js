@@ -78,11 +78,6 @@ $(function(){
 		});
 	}	
 
-	//todo fix this
-	function taskViewRender () {
-		var taskListView = new TaskListView({tasks: tasks, projects: projects, tags: tags});
-	}
-
 	function createProject (name) {
 		var new_project = new Project({
 				name: name,
@@ -135,7 +130,7 @@ $(function(){
 		}
 
 		if (task_id)
-			taskUpdate(task_id, {tags: tags_ids_arr.join()}, taskViewRender);
+			taskUpdate(task_id, {tags: tags_ids_arr.join()});
 
 	};
 
@@ -143,7 +138,7 @@ $(function(){
 
 		$("." + input_desc).remove();
 
-		taskUpdate(task_id, {desc: new_desc}, taskViewRender);
+		taskUpdate(task_id, {desc: new_desc});
 
 	};
 
@@ -212,8 +207,6 @@ $(function(){
 
 		//if press save on timer pause
 		main_button_pause.removeClass('active');
-
-		var taskListView = new TaskListView({tasks: tasks, projects: projects, tags: tags});
 
 		input_task_name.val('');
 		main_time.text('');
@@ -428,8 +421,6 @@ $(function(){
 					taskUpdate(selected_task_id, {project_id: selected_project.id});
 
 					$(".task" + selected_task_id + " ." + project_select2_str).remove();
-
-					var taskListView = new TaskListView({tasks: tasks, projects: projects, tags: tags});
 				}, 200);
 
 			});

@@ -35,6 +35,7 @@ $app->get(
     '/',
     function () use ($app) {
         include("index.html");
+
     }
 );
 
