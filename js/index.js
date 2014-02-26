@@ -1,15 +1,12 @@
 $(function(){
 
-	var projects = new Projects(),
-		last_new_project,
+	var last_new_project,
 		last_new_tags = [],
 		time_str,  
 		time,
 		timer_status,
 		interval,
 		current_task_id,
-		tasks = new Tasks(),
-		tags = new Tags(),
 
 		timer = 				$("#timer"),
 		main_select2_projects = $("#projects"),
@@ -144,40 +141,20 @@ $(function(){
 
 	function projectsSelect2Init () {
 
-		projects.fetch({
-		    success: function (model, response) {
-		        console.log("projects fetch success");
+		main_select2_projects.select2(project_select2_params).on("select2-selecting", function(e) {
 
-				main_select2_projects.select2(project_select2_params).on("select2-selecting", function(e) {
+			e.val == 0 && createProject(e.object.name);
 
-					e.val == 0 && createProject(e.object.name);
-
-				});
-
-		    },
-		    error: function (model, response) {
-		        console.log("error: projects fetch");
-		    }
 		});
 
 	}
 
 	function tagsSelect2Init () {
 
-		tags.fetch({
-		    success: function (model, response) {
-		        console.log("tags fetch success");
+		main_select2_tags.select2(tags_select2_params).on("select2-selecting", function(e) {
 
-				main_select2_tags.select2(tags_select2_params).on("select2-selecting", function(e) {
+			e.object.fl == 'new' && createTag(e.object.name);
 
-					e.object.fl == 'new' && createTag(e.object.name);
-
-				});
-
-		    },
-		    error: function (model, response) {
-		        console.log("error: projects fetch");
-		    }
 		});
 
 	}
@@ -232,21 +209,9 @@ $(function(){
 		},
 		initialize: function() {
 
-			tasks.fetch({
-			    success: function (model, response) {
-			        console.log("tasks fetch success");
-
-					projectsSelect2Init();
-					tagsSelect2Init();
-
-					setTimeout(function() {
-						var taskListView = new TaskListView({tasks: tasks, projects: projects, tags: tags});
-					}, 200);
-			    },
-			    error: function (model, response) {
-			        console.log("error: tasks fetch");
-			    }
-			});
+			projectsSelect2Init();
+			tagsSelect2Init();
+			var taskListView = new TaskListView({tasks: tasks, projects: projects, tags: tags});
 
 		},		
 		start: function () {

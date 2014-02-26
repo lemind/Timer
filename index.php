@@ -19,7 +19,11 @@ require 'Slim/Slim.php';
  * your Slim application now by passing an associative array
  * of setting names and values into the application constructor.
  */
-$app = new \Slim\Slim();
+//$app = new \Slim\Slim();
+
+$app = new \Slim\Slim(array(
+    'templates.path' => './views',
+));
 
 /**
  * Step 3: Define the Slim application routes
@@ -34,7 +38,17 @@ $app = new \Slim\Slim();
 $app->get(
     '/',
     function () use ($app) {
-        include("index.html");
+
+        //include("index.html");
+
+        $app->render(
+            'index.html',
+            array(
+                'tags' => getTags(),
+                'projects' => getProjects(),
+                'tasks' => getTasks()
+            )
+        );
 
     }
 );
@@ -44,23 +58,7 @@ $app->get(
     '/tasks',
     function () use ($app) {
 
-        try
-        {
-            $db = getConnection();
-
-            $sql = "select * from tasks";
-            //$sql = "select * from tasks order by `id` desc";
-            $stmt = $db->prepare($sql);
-            $stmt->execute();
-
-            $tasks = $stmt->fetchAll(PDO::FETCH_OBJ);
-
-            $db = null;
-
-            echo json_encode($tasks);
-        } catch(PDOException $e) {
-            echo '{"error":{"text":'. $e->getMessage() .'}}';
-        }
+        echo getTasks();
 
     }
 );
@@ -151,22 +149,8 @@ $app->get(
     '/projects',
     function () use ($app) {
 
-        try
-        {
-            $db = getConnection();
+        echo getProjects();
 
-            $sql = "select * from projects";
-            $stmt = $db->prepare($sql);
-            $stmt->execute();
-
-            $projects = $stmt->fetchAll(PDO::FETCH_OBJ);
-
-            $db = null;            
-
-            echo json_encode($projects);
-        } catch(PDOException $e) {
-            echo '{"error":{"text":'. $e->getMessage() .'}}';
-        }
     }
 );
 
@@ -202,22 +186,8 @@ $app->get(
     '/tags',
     function () use ($app) {
 
-        try
-        {
-            $db = getConnection();
+        echo getTags();
 
-            $sql = "select * from tags";
-            $stmt = $db->prepare($sql);
-            $stmt->execute();
-
-            $tags = $stmt->fetchAll(PDO::FETCH_OBJ);
-
-            $db = null;            
-
-            echo json_encode($tags);
-        } catch(PDOException $e) {
-            echo '{"error":{"text":'. $e->getMessage() .'}}';
-        }
     }
 );
 
@@ -266,4 +236,74 @@ function getConnection() {
     $dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpass);  
     $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     return $dbh;
+}
+
+function getTags() {
+
+    try
+    {
+        $db = getConnection();
+
+        $sql = "select * from tags";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+
+        $tags = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        $db = null;            
+
+        $result = json_encode($tags);
+    } catch(PDOException $e) {
+        $result = '{"error":{"text":'. $e->getMessage() .'}}';
+    }
+
+    return $result;
+
+}
+
+function getProjects() {
+
+    try
+    {
+        $db = getConnection();
+
+        $sql = "select * from projects";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+
+        $projects = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        $db = null;            
+
+        $result = json_encode($projects);
+    } catch(PDOException $e) {
+        $result = '{"error":{"text":'. $e->getMessage() .'}}';
+    }
+
+    return $result;
+
+}
+
+function getTasks() {
+
+    try
+    {
+        $db = getConnection();
+
+        $sql = "select * from tasks";
+        //$sql = "select * from tasks order by `id` desc";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+
+        $tasks = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        $db = null;
+
+        $result = json_encode($tasks);
+    } catch(PDOException $e) {
+        $result = '{"error":{"text":'. $e->getMessage() .'}}';
+    }
+
+    return $result;
+
 }

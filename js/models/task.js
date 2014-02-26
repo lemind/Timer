@@ -8,12 +8,13 @@ window.Tasks = Backbone.Collection.extend({
 
 	initialize: function() { 
 
-		this.on('change:tags', this.changeTags, this);
-		this.on('add', this.changeTags, this);
+		this.on('change:tags', this.createTagsIdsArr, this);
+		this.on('add', this.createTagsIdsArr, this);
+		this.on('reset', this.createTagsIdsArrs, this);
 
 	},
 
-	changeTags: function(model) { 
+	createTagsIdsArr: function(model) { 
 		var tags_ids_arr = [];
 
 		if (model.get('tags')) {
@@ -25,6 +26,16 @@ window.Tasks = Backbone.Collection.extend({
 		} else {
 			model.set({tags_ids_arr: null});
 		}
+
+	},
+
+	createTagsIdsArrs: function(model) { 
+
+		var self = this;
+
+		model.forEach(function(model_task) {
+			self.createTagsIdsArr(model_task);
+		});
 
 	},
 
