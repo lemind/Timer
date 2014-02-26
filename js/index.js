@@ -19,6 +19,7 @@ $(function(){
 		project_select2_str = 	'project-select2',
 		tags_select2 = 			'tags-select2',
 		input_desc = 			'input_desc',
+		editing = 				'editing',
 
  		project_select2_params = {
 			placeholder: "Select project",
@@ -59,6 +60,10 @@ $(function(){
 		$("." + tags_select2).length > 0 && taskTagsUpdate($("." + tags_select2).parent().attr("task_id"), $("." + tags_select2).select2('data'));
 
 		$("." + input_desc).length > 0 && taskDescUpdate($("." + input_desc).parents(".task").attr("id"), $("." + input_desc + " input").val());
+	});
+
+	$('html').keyup(function(ev) { 
+		ev.which == 27 && $("." + editing).remove();
 	});
 
 	function taskUpdate (id, arg, cb) {
@@ -383,7 +388,7 @@ $(function(){
 
 			if (selected_task_id != current_task_id) {
 
-				el_task_line.parent().append('<div class="' + project_select2_str + '"></div>');
+				el_task_line.parent().append('<div class="' + project_select2_str + ' ' + editing + '"></div>');
 
 				$("." + project_select2_str).select2(project_select2_params).on("select2-selecting", function(e) {
 
@@ -422,7 +427,7 @@ $(function(){
 
 			if (selected_task_id != current_task_id) {
 
-				el_task_line.append('<div class="' + tags_select2 + '"></div>');
+				el_task_line.append('<div class="' + tags_select2 + ' ' + editing + '"></div>');
 
 				task = tasks.get(selected_task_id);
 
@@ -448,7 +453,8 @@ $(function(){
 		editDesc: function (ev) {
 
 			var el_task_line = $(ev.target),
-				task;
+				task,
+				input;
 
 			ev.stopPropagation();
 
@@ -460,9 +466,18 @@ $(function(){
 
 				task = tasks.get(selected_task_id);
 
-				el_task_line.parent().append('<div class="' + input_desc + '"><input></div>');
+				el_task_line.parent().append('<div class="' + input_desc + ' ' + editing + '"><input></div>');
+
+				//set cursor
+				input = $('.' + input_desc + ' input');
+				input[0].selectionStart = input[0].selectionEnd = input.val().length;
 
 				$("." + input_desc).click(function(ev) { ev.stopPropagation(); });
+
+				$("." + input_desc).keypress(function(ev) { 
+					ev.stopPropagation(); 
+					ev.which == 13 && taskDescUpdate($("." + input_desc).parents(".task").attr("id"), $("." + input_desc + " input").val());
+				});
 
 				$(".task" + selected_task_id + " ." + input_desc + " input").val(task.get('desc'));
 			}
