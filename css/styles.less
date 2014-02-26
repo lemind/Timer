@@ -92,9 +92,25 @@ html { body
 		{
 			margin-top: 30px;
 
-			tr
+			tr.task
 			{
 				height: @tr-height;
+
+				&.active
+				{
+					background: khaki;
+				}
+
+				&:not(.active) .edited
+				{
+					cursor: pointer;
+
+					&:hover
+					{
+						background: plum;
+						color: #fff;
+					}
+				}
 			}
 
 			th
@@ -116,14 +132,7 @@ html { body
 						padding: 6px 0px;
 						box-sizing: border-box;
 						margin: 3px 0;
-						cursor: pointer;
 						border-radius: 5px;
-
-						&:hover
-						{
-							background: plum;
-							color: #fff;
-						}
 					}
 
 					.input_desc
@@ -154,15 +163,9 @@ html { body
 
 				.name 
 				{	
-					cursor: pointer;
 					padding: 6px 10px;
 					color: #fff;
 					border-radius: 5px;
-
-					&:hover
-					{
-						opacity: .7;
-					}
 
 					&.mediumaquamarine {background: @mediumaquamarine;}
 					&.mediumorchid {background: @mediumorchid;}
@@ -190,7 +193,6 @@ html { body
 
 			td .tags 
 			{
-				cursor: pointer;
 				position: relative;
 				height: @tr-height;
 				border-radius: 5px;
@@ -206,12 +208,6 @@ html { body
 					border: 1px solid darkgray;
 					width: 100%;
 					z-index: 1;
-				}
-
-
-				&:hover
-				{
-					background: plum;
 				}
 
 				span.tag 

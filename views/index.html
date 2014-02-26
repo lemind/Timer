@@ -82,18 +82,18 @@
 		  </thead>
 		  <tbody>
 		    <% _.each(tasks.reverse(), function(task) { %>
-		      <tr class="task task<%= task.get('id') %>" id="<%= task.get('id') %>">
+		      <tr class="task task<%= task.get('id') %> <%= task.get('active') && 'active' %>" id="<%= task.get('id') %>">
 		        <td><%= task.get('date') %></td>
-		        <td class="desc"><div class="name"><%= task.get('desc') %></div></td>
+		        <td class="desc"><div class="name edited"><%= task.get('desc') %></div></td>
 		        <td><%= task.get('time_str') %></td>
 		        <td><%= task.get('time') %></td>
 		        <td class="project">
-		        	<div class="name <%= colors['projects'][projects.get(task.get('project_id')).get('color')] %>" task_id="<%= task.get('id') %>"><%= projects.get(task.get('project_id')).get('name') %></div>
+		        	<div class="name edited <%= colors['projects'][projects.get(task.get('project_id')).get('color')] %>" task_id="<%= task.get('id') %>"><%= projects.get(task.get('project_id')).get('name') %></div>
 		        </td>
-		        <td><button type="submit" class="btn start btn-default">Start</button></td>
+		        <td><button type="submit" class="btn start btn-default <%= task.get('active') && 'hide' %>">Start</button></td>
 		        <td><button type="submit" class="btn delete btn-default">Delete</button></td>
 		        <td>
-		        	<div class="tags" task_id="<%= task.get('id') %>">
+		        	<div class="tags edited" task_id="<%= task.get('id') %>">
 			        	<% _.each(task.get('tags_ids_arr'), function(tag_id) { %>
 			        		<span class="tag <%= colors['tags'][tags.get(tag_id).get('color')] %>"><%= tags.get(tag_id).get('name') %></span>
 			        	<% }); %>
