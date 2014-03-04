@@ -1,7 +1,6 @@
 $(function(){
 
 	var last_new_project,
-		last_new_tags = [],
 		time_str,  
 		time,
 		timer_status,
@@ -110,10 +109,6 @@ $(function(){
 					current_task_tags = [];
 
 		    	tags.add(new Tag(response));
-		    	//last_new_tags.push(response.id);
-
-		    	console.log('-------- new tag ------');
-		    	console.log(selected_tags);
 
 				selected_tags.forEach(function(tag) {
 					if (tag.fl != 'new') tags_ids_arr.push(tag.id);
@@ -126,8 +121,6 @@ $(function(){
 				});
 
 				select2.select2("data", current_task_tags);
-
-				console.log(select2.select2('data'));
 
 		    },
 		    error: function (model, response) {
@@ -147,11 +140,6 @@ $(function(){
 				if (tag.fl != 'new') tags_ids_arr.push(tag.id);
 			});
 		}
-
-		// if (last_new_tags.length) {
-		// 	tags_ids_arr = tags_ids_arr.concat(last_new_tags);	
-		// 	last_new_tags = [];
-		// }
 
 		if (task_id)
 			taskUpdate(task_id, {tags: tags_ids_arr.join()});
@@ -268,11 +256,6 @@ $(function(){
 			selected_tags.forEach(function(tag) {
 				if (tag.fl != 'new') tags_ids_arr.push(tag.id);
 			});
-
-			// if (last_new_tags.length) {
-			// 	tags_ids_arr = tags_ids_arr.concat(last_new_tags);
-			// 	last_new_tags = [];
-			// }
 
 			clearInterval(interval);
 
