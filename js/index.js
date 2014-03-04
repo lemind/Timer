@@ -97,7 +97,7 @@ $(function(){
 		});
 	 }
 
-	 function createTag (name) {
+	 function createTag (name, select2) {
 		var new_tag = new Tag({
 				name: name,
 				color: Math.floor(Math.random() * 9)
@@ -105,8 +105,30 @@ $(function(){
 
 		new_tag.save(null, {
 		    success: function (model, response) {
+				var selected_tags = select2.select2('data'),
+					tags_ids_arr = [],
+					current_task_tags = [];
+
 		    	tags.add(new Tag(response));
-		    	last_new_tags.push(response.id);
+		    	//last_new_tags.push(response.id);
+
+		    	console.log('-------- new tag ------');
+		    	console.log(selected_tags);
+
+				selected_tags.forEach(function(tag) {
+					if (tag.fl != 'new') tags_ids_arr.push(tag.id);
+				});
+
+				tags_ids_arr.push(response.id);
+
+				tags_ids_arr.forEach(function(id) {
+					current_task_tags.push(tags.get(id).toJSON());
+				});
+
+				select2.select2("data", current_task_tags);
+
+				console.log(select2.select2('data'));
+
 		    },
 		    error: function (model, response) {
 		        console.log("error: save new tag");
@@ -126,10 +148,10 @@ $(function(){
 			});
 		}
 
-		if (last_new_tags.length) {
-			tags_ids_arr = tags_ids_arr.concat(last_new_tags);	
-			last_new_tags = [];
-		}
+		// if (last_new_tags.length) {
+		// 	tags_ids_arr = tags_ids_arr.concat(last_new_tags);	
+		// 	last_new_tags = [];
+		// }
 
 		if (task_id)
 			taskUpdate(task_id, {tags: tags_ids_arr.join()});
@@ -158,7 +180,7 @@ $(function(){
 
 		main_select2_tags.select2(tags_select2_params).on("select2-selecting", function(e) {
 
-			e.object.fl == 'new' && createTag(e.object.name);
+			e.object.fl == 'new' && createTag(e.object.name, main_select2_tags);
 
 		});
 
@@ -247,10 +269,10 @@ $(function(){
 				if (tag.fl != 'new') tags_ids_arr.push(tag.id);
 			});
 
-			if (last_new_tags.length) {
-				tags_ids_arr = tags_ids_arr.concat(last_new_tags);	
-				last_new_tags = [];
-			}
+			// if (last_new_tags.length) {
+			// 	tags_ids_arr = tags_ids_arr.concat(last_new_tags);
+			// 	last_new_tags = [];
+			// }
 
 			clearInterval(interval);
 
@@ -317,8 +339,6 @@ $(function(){
 
 			task = tasks.get(current_task_id);
 
-			task.set('active', true);
-
 			// set data new started task after current task stop
 			setTimeout(function() {
 				main_button_start
@@ -344,6 +364,7 @@ $(function(){
 					timerStart();
 				} else {
 					$(".task" + current_task_id + ' .start').addClass('hide');
+					task.set('active', true);
 					timerStart(task.get('time'));					
 				}
 
@@ -433,7 +454,7 @@ $(function(){
 
 				$("." + tags_select2).select2(tags_select2_params).on("select2-selecting", function(e) {
 
-					e.object.fl == 'new' && createTag(e.object.name);
+					e.object.fl == 'new' && createTag(e.object.name, $("." + tags_select2));
 
 				});
 
