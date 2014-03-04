@@ -80,7 +80,8 @@
 		    </tr>
 		  </thead>
 		  <tbody>
-		    <% _.each(tasks.reverse(), function(task) { %>
+		    <% _.each(tasks.reverse(), function(task, key) { %>
+
 		      <tr class="task task<%= task.get('id') %> <%= task.get('active') && 'active' %>" id="<%= task.get('id') %>">
 		        <td><%= task.get('date') %></td>
 		        <td class="desc"><div class="name edited"><%= task.get('desc') %></div></td>
@@ -100,8 +101,13 @@
 
 
 		      </tr>
+
+		      <% if (key+1 < tasks.length) if (tasks[key].get('date') != tasks[key + 1].get('date')) { 
+		      	%> <tr class="line"><td colspan="7"></td></tr> <%
+		      } %>
 		    <% }); %>
 		    <% tasks.reverse(); %>
+
 		  </tbody>
 		</table>
 		</script>
