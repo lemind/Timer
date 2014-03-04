@@ -23,7 +23,7 @@ $(function(){
  		project_select2_params = {
 			placeholder: "Select project",
 			quietMillis: 100,
-			data: function() { return {results: projects.toJSON()}; },
+			data: function() { return {results: projects.toJSON(), text: 'name'}; },
 			formatResult: function(post) {
 				return post.name;
 			},
@@ -39,7 +39,7 @@ $(function(){
 			placeholder: "Select tags",
 			quietMillis: 100,
 			multiple: true,
-			data: function() { return {results: tags.toJSON()}; },
+			data: function() { return {results: tags.toJSON(), text: 'name'}; },
 			formatResult: function(post) {
 				return post.name;
 			},
