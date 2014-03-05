@@ -351,7 +351,7 @@ $(function(){
 					timerStart(task.get('time'));					
 				}
 
-			}, 200);
+			}, 300);
 
 		},		
 		deleteTask: function (ev) {
