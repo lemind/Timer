@@ -16,8 +16,25 @@ $app->get(
             array(
                 'tags' => getTags(),
                 'projects' => getProjects(),
-                'tasks' => getTasks()
+                'tasks' => getTasks(),
+                'page' => 'home'
             )
+        );
+    }
+);
+
+$app->get(
+    '/summary',
+    function () use ($app) {
+
+        $app->render(
+            'summary_report.html',
+            array(
+                'tags' => getTags(),
+                'projects' => getProjects(),
+                'tasks' => getTasks(),                
+                'page' => 'summary'
+            )            
         );
     }
 );

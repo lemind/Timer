@@ -41,15 +41,15 @@
 @lightslategray: LightSlategray;
 @lightgray: LightGray;
 //projects
-@mediumaquamarine: MediumAquaMarine;
-@mediumorchid: MediumOrchid;
-@mediumpurple: MediumPurple;
-@mediumseagreen: MediumSeaGreen;
-@mediumslateblue: MediumSlateBlue;
-@mediumspringgreen: MediumSpringGreen;
-@mediumturquoise: MediumTurquoise;
-@mediumvioletred: MediumVioletRed;
-@violet: Violet;
+@project1: MediumAquaMarine;
+@project2: MediumSlateBlue;
+@project3: OrangeRed;
+@project4: Navy;
+@project5: Crimson;
+@project6: Gold;
+@project7: DarkKhaki;
+@project8: DarkMagenta;
+@project9: Olive;
 
 html { body 
 {
@@ -66,6 +66,19 @@ html { body
 		margin: 0 auto;
 		padding: 10px;
 		.box-sizing(border-box);
+
+		h1 
+		{
+			width: 120px;
+			display: inline-block;		
+		}
+
+		.nav
+		{
+			display: inline-block;
+			margin-left: 50px;
+			vertical-align: middle;
+		}
 	}
 	/* Header - end */
 
@@ -173,15 +186,15 @@ html { body
 					color: #fff;
 					border-radius: 5px;
 
-					&.mediumaquamarine {background: @mediumaquamarine;}
-					&.mediumorchid {background: @mediumorchid;}
-					&.mediumpurple {background: @mediumpurple;}
-					&.mediumseagreen {background: @mediumseagreen;}
-					&.mediumslateblue {background: @mediumslateblue;}
-					&.mediumspringgreen {background: @mediumspringgreen;}
-					&.mediumturquoise {background: @mediumturquoise;}
-					&.mediumvioletred {background: @mediumvioletred;}
-					&.violet {background: @violet;}
+					&.mediumaquamarine {background: @project1;}
+					&.mediumorchid {background: @project2;}
+					&.mediumpurple {background: @project3;}
+					&.mediumseagreen {background: @project4;}
+					&.mediumslateblue {background: @project5;}
+					&.mediumspringgreen {background: @project6;}
+					&.mediumturquoise {background: @project7;}
+					&.mediumvioletred {background: @project8;}
+					&.violet {background: @project9;}
 				}
 
 				.project-select2
@@ -251,6 +264,15 @@ html { body
 	}
 
 	/* Content - end */
+
+	/* Summary-report - start */
+
+	.summary-report 
+	{
+		.content;
+	}
+
+	/* Summary-report - end */
 
 	/* Footer - start */
 

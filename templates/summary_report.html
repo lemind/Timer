@@ -1,2 +1,14 @@
+{% include 'header.html' %}
 
-<div class="report"></div>
+<div class="summary-report">
+	
+	<div class="period">
+		<input type="text" id="from" name="from">
+		<input type="text" id="to" name="to">
+	</div>
+
+	<canvas id="summary-report" width="200" height="200"></canvas>
+
+</div>
+
+{% include 'footer.html' %}
