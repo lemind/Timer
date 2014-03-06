@@ -6,6 +6,7 @@ $(function(){
 		timer_status,
 		interval,
 		current_task_id,
+		pause_status = 0,
 
 		timer = 				$("#timer"),
 		main_select2_projects = $("#projects"),
@@ -197,8 +198,8 @@ $(function(){
 			.addClass('start')
 			.removeClass('stop');
 
-		//if press save on timer pause
-		main_button_pause.removeClass('active');
+		pause_status && main_button_pause.removeClass('active');
+		pause_status = 0;
 
 		input_task_name.val('');
 		main_time.text('');
@@ -305,6 +306,8 @@ $(function(){
 
 			timer_status = !timer_status;
 
+			pause_status = 1;
+
 		},
 		oldTaskStart: function (ev) {
 			var tags_ids = [],
@@ -312,7 +315,7 @@ $(function(){
 				el_task_line,
 				task;
 
-			timer_status && this.stop();
+			(pause_status || timer_status) && this.stop();
 
 			main_button_pause.attr("disabled", false);
 
