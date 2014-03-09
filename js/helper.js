@@ -29,3 +29,19 @@ function getCurrentDate() {
 	
 	return yyyy + '-' + mm + '-' + dd;
 }
+
+function getProjectColor(id) {
+	var colors = [
+			'MediumAquaMarine',
+			'MediumSlateBlue',
+			'OrangeRed',
+			'Navy',
+			'Crimson',
+			'Gold',
+			'DarkKhaki',
+			'DarkMagenta',
+			'Olive',
+		]
+
+	return colors[id];
+}

@@ -1,0 +1,38 @@
+<script type="text/template" id="projects-detailed-template">
+
+<div class="projects-list panel-group" id="accordion">
+
+	<% _.each(projects, function(project, key) { %>
+		<% console.log(project.tasks_list.length); %>
+		<% if (!$.isEmptyObject(project.tasks_list)) { %>
+
+		<div class="project panel panel-default">
+			<div class="panel-heading">
+				<span class="panel-title">
+					<a data-toggle="collapse" data-parent="#accordion" href="#<%= key %>">
+						<%= key %>
+					</a>
+				</span>
+			</div>
+			<div id="<%= key %>" class="panel-collapse collapse">
+				<div class="panel-body">
+					<div class="tasks-list">
+					<% _.each(project.tasks_list, function(task, key) { %>
+
+						<div class="task">
+							<span><%= key %></span>
+							<span><%= msToTime(task.time) %></span>
+						</div>
+
+					<% }); %>
+					</div>
+					<div class="talks-pie"></div>
+				</div>
+			</div>
+		</div>
+
+		<% } %>
+	<% }); %>
+</div>
+
+</script>
