@@ -74,6 +74,9 @@ $(function(){
 						projects_detailed[item.name].tasks_list[task.get('desc')] = projects_detailed[item.name].tasks_list[task.get('desc')] || {};
 						projects_detailed[item.name].tasks_list[task.get('desc')].time = projects_detailed[item.name].tasks_list[task.get('desc')].time || 0;
 						projects_detailed[item.name].tasks_list[task.get('desc')].time += parseInt(task.get('time'));
+
+						projects_detailed[item.name].sum_time = projects_detailed[item.name].sum_time || 0;
+						projects_detailed[item.name].sum_time += parseInt(task.get('time'));
 					}
 				});
 
@@ -89,7 +92,7 @@ $(function(){
 
 		//console.log(tasks_bar_series);
 		console.log(projects_detailed);
-		
+
 		projectsDetailedView = new ProjectsDetailedView({projects: projects_detailed});
 
 

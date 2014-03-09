@@ -3,7 +3,6 @@
 <div class="projects-list panel-group" id="accordion">
 
 	<% _.each(projects, function(project, key) { %>
-		<% console.log(project.tasks_list.length); %>
 		<% if (!$.isEmptyObject(project.tasks_list)) { %>
 
 		<div class="project panel panel-default">
@@ -26,6 +25,7 @@
 
 					<% }); %>
 					</div>
+					<div class="sum-time-project">sum: <%= msToTime(project.sum_time) %></div>
 					<div class="talks-pie"></div>
 				</div>
 			</div>
