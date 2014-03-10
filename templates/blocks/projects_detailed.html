@@ -19,14 +19,16 @@
 					<% _.each(project.tasks_list, function(task, key) { %>
 
 						<div class="task">
-							<span><%= key %></span>
-							<span><%= msToTime(task.time) %></span>
+							<span class="task-desc"><%= key %></span>
+							<span class="task-time"><%= msToTime(task.time) %></span>
 						</div>
 
 					<% }); %>
 					</div>
-					<div class="sum-time-project">sum: <%= msToTime(project.sum_time) %></div>
-					<div class="talks-pie"></div>
+					<div class="sum">
+						<span class="sum-desc">sum:</span>
+						<span class="sum-time"><%= msToTime(project.sum_time) %></span>
+					</div>
 				</div>
 			</div>
 		</div>

@@ -3,7 +3,7 @@
     "use strict";
 
     window.ProjectsDetailedView = Backbone.View.extend({
-        el: '.projects_detailed',
+        el: '.projects-detailed',
         initialize:function(options){
             this.projects  = options.projects;
             this.render();

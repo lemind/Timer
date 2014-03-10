@@ -39,7 +39,7 @@ $(function(){
 			tasks_by_days[task_date] = tasks_by_days[task_date] || {};
 			tasks_by_days[task_date].tasks_list = tasks_by_days[task_date].tasks_list || [];
 
-			current_project_name = projects.get(task.get('project_id')).get('name');
+			current_project_name = projects.get(task.get('project_id')).get('name').replace(/ +/,'_');;
 
 			tasks_by_days[task_date].by_project = tasks_by_days[task_date].by_project || {};
 			tasks_by_days[task_date].by_project[current_project_name] = tasks_by_days[task_date].by_project[current_project_name] || {};
@@ -56,13 +56,13 @@ $(function(){
 			}
 		});
 
-		console.log(tasks_by_days);
+		//console.log(tasks_by_days);
 
 		projects.forEach(function(project) {
 			var item = {data: []};
 
 			item.color = getProjectColor(project.get('color'));
-			item.name = project.get('name');
+			item.name = project.get('name').replace(/ +/,'_');;
 
 			projects_detailed[item.name] = projects_detailed[item.name] || {};
 			projects_detailed[item.name].tasks_list = projects_detailed[item.name].tasks_list || {};
@@ -77,6 +77,8 @@ $(function(){
 
 						projects_detailed[item.name].sum_time = projects_detailed[item.name].sum_time || 0;
 						projects_detailed[item.name].sum_time += parseInt(task.get('time'));
+
+						projects_detailed[item.name].color = projects_detailed[item.name].color || project.get('color');
 					}
 				});
 
@@ -91,7 +93,7 @@ $(function(){
 		});
 
 		//console.log(tasks_bar_series);
-		console.log(projects_detailed);
+		//console.log(projects_detailed);
 
 		projectsDetailedView = new ProjectsDetailedView({projects: projects_detailed});
 
@@ -161,6 +163,110 @@ $(function(){
             },
             series: tasks_bar_series
         });
+
+		Highcharts.setOptions({
+		    lang: {
+		        drillUpText: '<- Back to {series.name}'
+		    }
+		});
+
+		//prepare to drilldown pie
+		var projects_detailed_pie = [],
+			projects_detailed_pie_drilldown,
+			pdp_series = {
+				name: 'projects',
+				colorByPoint: true,
+				data: []
+			},
+			pdp_series_drilldown = {
+				series: []
+			};
+
+		//prepare data to drilldown pie
+		$.each(projects_detailed, function(key, project) {
+			var data = [];
+
+			pdp_series.data.push({
+                name: key,
+                y: project.sum_time,
+                drilldown: key,
+                //color: getProjectColor(project.color)
+			});
+
+			$.each(project.tasks_list, function(key, task) {
+				data.push([key, task.time]);
+			});
+
+			pdp_series_drilldown.series.push({
+				id: key,
+				data: data
+			});
+		});
+
+		console.log(pdp_series_drilldown);
+		var total = 0;		
+
+        // Create the drilldown chart
+        $('.projects-detailed-drilldown-pie').highcharts({
+			chart: {
+				type:'pie',
+                events: {
+                    load: function(event) {
+                    	console.log('add total');
+                        //$('.highcharts-legend-item').last().append('<br/><div style="width:230px"><hr/> <span style="float:left"> Total </span><span style="float:right"> ' + msToTime(total) + '</span> </div>')
+                    }
+                }
+                  
+            },        	
+            title: {
+                text: ''
+            },
+            subtitle: {
+                text: ''
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+					animation: false,
+                    cursor: 'pointer',
+                    showInLegend: true,
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function() {
+                            return this.percentage.toFixed(2) + '%';
+                        }
+                    }
+                }
+            },
+            legend: {
+                enabled: true,
+                layout: 'vertical',
+                align: 'right',
+                width: 250,
+                verticalAlign: 'top',
+				borderWidth: 0,
+                useHTML: true,
+				labelFormatter: function() {
+                    total += this.y;
+					return '<div style="width:230px"><span style="float:left">' + this.name + '</span><span style="float:right">' + msToTime(this.y) + '</span></div>';
+				},
+				title: {
+					text: '',
+					style: {
+						fontWeight: 'bold'
+					}
+				}
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+	            formatter: function() {
+	                return '<span style="color:' + this.color + '">' + this.key + '</span>: ' + msToTime(this.y);
+	            }                
+            }, 
+            series: [pdp_series],
+	        drilldown: pdp_series_drilldown
+
+        })
 
 
 	}
