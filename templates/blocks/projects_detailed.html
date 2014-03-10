@@ -2,7 +2,7 @@
 
 <div class="projects-list panel-group" id="accordion">
 
-	<% _.each(projects, function(project, key) { %>
+	<% _.each(projects.projects_list, function(project, key) { %>
 		<% if (!$.isEmptyObject(project.tasks_list)) { %>
 
 		<div class="project panel panel-default">
@@ -36,5 +36,6 @@
 		<% } %>
 	<% }); %>
 </div>
+<div class="period-total-time">Period total time: <%= msToTime(projects.total_time) %></div>
 
 </script>

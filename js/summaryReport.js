@@ -7,7 +7,8 @@ $(function(){
 	    	tasks_bar_series = [],
 	    	projects_detailed = {},
 	    	current_day,
-	    	projectsDetailedView;
+	    	projectsDetailedView,
+	    	period_total_time = 0;
 
 		//period
 	    $( "#from" ).attr("placeholder", "period start").datepicker({
@@ -62,7 +63,7 @@ $(function(){
 			var item = {data: []};
 
 			item.color = getProjectColor(project.get('color'));
-			item.name = project.get('name').replace(/ +/,'_');;
+			item.name = project.get('name').replace(/ +/,'_');
 
 			projects_detailed[item.name] = projects_detailed[item.name] || {};
 			projects_detailed[item.name].tasks_list = projects_detailed[item.name].tasks_list || {};
@@ -92,10 +93,47 @@ $(function(){
 			tasks_bar_series.push(item);
 		});
 
-		//console.log(tasks_bar_series);
-		//console.log(projects_detailed);
+		var projects_detailed_pie = [],
+			projects_detailed_pie_drilldown,
+			pdp_series = {
+				name: 'projects',
+				colorByPoint: true,
+				data: []
+			},
+			pdp_series_drilldown = {
+				series: []
+			};
 
-		projectsDetailedView = new ProjectsDetailedView({projects: projects_detailed});
+		//prepare data to drilldown pie
+		$.each(projects_detailed, function(key, project) {
+			var data = [];
+
+			pdp_series.data.push({
+                name: key,
+                y: project.sum_time,
+                drilldown: key,
+                // https://github.com/highslide-software/highcharts.com/issues/2784
+                //color: getProjectColor(project.color)
+			});
+
+			$.each(project.tasks_list, function(key, task) {
+				data.push([key, task.time]);
+			});
+
+			pdp_series_drilldown.series.push({
+				id: key,
+				data: data
+			});
+
+			period_total_time += project.sum_time;
+		});
+
+		projectsDetailedView = new ProjectsDetailedView({
+				projects: {
+					projects_list: projects_detailed, 
+					total_time: period_total_time
+				}
+			});
 
 
         $("#summary-report-bar").highcharts({
@@ -170,53 +208,46 @@ $(function(){
 		    }
 		});
 
-		//prepare to drilldown pie
-		var projects_detailed_pie = [],
-			projects_detailed_pie_drilldown,
-			pdp_series = {
-				name: 'projects',
-				colorByPoint: true,
-				data: []
-			},
-			pdp_series_drilldown = {
-				series: []
-			};
+		// //prepare to drilldown pie
+		// var projects_detailed_pie = [],
+		// 	projects_detailed_pie_drilldown,
+		// 	pdp_series = {
+		// 		name: 'projects',
+		// 		colorByPoint: true,
+		// 		data: []
+		// 	},
+		// 	pdp_series_drilldown = {
+		// 		series: []
+		// 	};
 
-		//prepare data to drilldown pie
-		$.each(projects_detailed, function(key, project) {
-			var data = [];
+		// //prepare data to drilldown pie
+		// $.each(projects_detailed, function(key, project) {
+		// 	var data = [];
 
-			pdp_series.data.push({
-                name: key,
-                y: project.sum_time,
-                drilldown: key,
-                //color: getProjectColor(project.color)
-			});
+		// 	pdp_series.data.push({
+  //               name: key,
+  //               y: project.sum_time,
+  //               drilldown: key,
+  //               // https://github.com/highslide-software/highcharts.com/issues/2784
+  //               //color: getProjectColor(project.color)
+		// 	});
 
-			$.each(project.tasks_list, function(key, task) {
-				data.push([key, task.time]);
-			});
+		// 	$.each(project.tasks_list, function(key, task) {
+		// 		data.push([key, task.time]);
+		// 	});
 
-			pdp_series_drilldown.series.push({
-				id: key,
-				data: data
-			});
-		});
+		// 	pdp_series_drilldown.series.push({
+		// 		id: key,
+		// 		data: data
+		// 	});
+		// });
 
-		console.log(pdp_series_drilldown);
-		var total = 0;		
+		//console.log(pdp_series_drilldown);
 
         // Create the drilldown chart
         $('.projects-detailed-drilldown-pie').highcharts({
 			chart: {
-				type:'pie',
-                events: {
-                    load: function(event) {
-                    	console.log('add total');
-                        //$('.highcharts-legend-item').last().append('<br/><div style="width:230px"><hr/> <span style="float:left"> Total </span><span style="float:right"> ' + msToTime(total) + '</span> </div>')
-                    }
-                }
-                  
+				type:'pie'
             },        	
             title: {
                 text: ''
@@ -247,7 +278,6 @@ $(function(){
 				borderWidth: 0,
                 useHTML: true,
 				labelFormatter: function() {
-                    total += this.y;
 					return '<div style="width:230px"><span style="float:left">' + this.name + '</span><span style="float:right">' + msToTime(this.y) + '</span></div>';
 				},
 				title: {
