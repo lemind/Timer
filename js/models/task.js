@@ -39,6 +39,18 @@ window.Tasks = Backbone.Collection.extend({
 
 	},
 
+	getTasksByDates: function(date_start, date_end) {
+		var gf = this.models.filter(function(model) {
+
+			return (
+				model.get('date') >= date_start &&
+				model.get('date') <= date_end
+			)
+		});
+
+		return gf;
+	},
+
     model: Task,
     url: 'tasks'
 

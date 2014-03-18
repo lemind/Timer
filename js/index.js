@@ -272,7 +272,7 @@ $(function(){
 							project_id:		selected_project.id, 
 							desc: 			input_task_name.val(),
 							tags:			tags_ids_arr.join(),
-							date:			getCurrentDate()
+							date:			getFormatDate()
 						}), { 
 							success: function (model, response) {
 								resetVariables();
@@ -347,7 +347,7 @@ $(function(){
 						main_select2_tags.select2("data", current_task_tags);
 					}
 
-					if (getCurrentDate() > task.get('date')) {
+					if (getFormatDate() > task.get('date')) {
 						current_task_id = 0;
 						timerStart();
 					} else {
@@ -356,7 +356,7 @@ $(function(){
 						timerStart(task.get('time'));					
 					}
 
-				}, 300);
+				}, 500);
 
 			},		
 			deleteTask: function (ev) {

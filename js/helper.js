@@ -18,11 +18,11 @@ function msToTime(s) {
 	}
 }
 
-function getCurrentDate() {
-	var	today = new Date(),
-		dd = today.getDate(),
-		mm = today.getMonth() + 1,
-		yyyy = today.getFullYear();
+function getFormatDate(date) {
+	var date = (typeof date === "undefined") ? new Date() : date,
+		dd = date.getDate(),
+		mm = date.getMonth() + 1,
+		yyyy = date.getFullYear();
 
 	dd = dd < 10 ? '0' + dd : dd;
 	mm = mm < 10 ? '0' + mm : dd;
@@ -32,15 +32,15 @@ function getCurrentDate() {
 
 function getProjectColor(id) {
 	var colors = [
-			'MediumAquaMarine',
-			'MediumSlateBlue',
-			'OrangeRed',
-			'Navy',
-			'Crimson',
-			'Gold',
-			'DarkKhaki',
-			'DarkMagenta',
-			'Olive',
+			'#66CDAA',
+			'#7B68EE',
+			'#FF4500',
+			'#000080',
+			'#DC143C',
+			'#FFD700',
+			'#BDB76B',
+			'#8B008B',
+			'#808000',
 		]
 
 	return colors[id];
