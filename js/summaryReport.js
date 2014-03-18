@@ -35,7 +35,7 @@ $(function(){
 					var today = new Date(), 
 						week_ago = new Date();
 
-					week_ago.setDate(today.getDate()-5);
+					week_ago.setDate(today.getDate()-6);
 
 					$('#from').datepicker('setDate', week_ago);
 					$('#to').datepicker('setDate', today);
@@ -66,6 +66,7 @@ $(function(){
 		    	projectsDetailedView,
 		    	period_total_time = 0;
 
+		    //forming task by days
 			tasks_filtered.forEach(function(task) {
 				var task_date = task.get('date'),
 					current_project_name;
@@ -76,14 +77,14 @@ $(function(){
 				tasks_by_days[task_date] = tasks_by_days[task_date] || {};
 				tasks_by_days[task_date].tasks_list = tasks_by_days[task_date].tasks_list || [];
 
-				current_project_name = projects.get(task.get('project_id')).get('name').replace(/ +/,'_');;
+				current_project_id = task.get('project_id');
 
 				tasks_by_days[task_date].by_project = tasks_by_days[task_date].by_project || {};
-				tasks_by_days[task_date].by_project[current_project_name] = tasks_by_days[task_date].by_project[current_project_name] || {};
 
-				tasks_by_days[task_date].by_project[current_project_name].sum = tasks_by_days[task_date].by_project[current_project_name].sum || 0;
+				tasks_by_days[task_date].by_project[current_project_id] = tasks_by_days[task_date].by_project[current_project_id] || {};
 
-				tasks_by_days[task_date].by_project[current_project_name].sum += parseInt(task.get('time'));
+				tasks_by_days[task_date].by_project[current_project_id].sum = tasks_by_days[task_date].by_project[current_project_id].sum || 0;
+				tasks_by_days[task_date].by_project[current_project_id].sum += parseInt(task.get('time'));
 
 				tasks_by_days[task_date].tasks_list.push(task);
 
@@ -93,35 +94,36 @@ $(function(){
 				}
 			});
 
-			//console.log(tasks_by_days);
-
+			//forming projects_detailed
 			projects.forEach(function(project) {
 				var item = {data: []};
 
 				item.color = getProjectColor(project.get('color'));
 				item.name = project.get('name').replace(/ +/,'_');
+				item.id = project.get('id');
 
-
-				projects_detailed[item.name] = projects_detailed[item.name] || {};
-				projects_detailed[item.name].tasks_list = projects_detailed[item.name].tasks_list || {};
+				projects_detailed[item.id] = projects_detailed[item.id] || {};
+				projects_detailed[item.id].tasks_list = projects_detailed[item.id].tasks_list || {};
 
 				$.each(tasks_by_days, function(index, value) {
 
 					value.tasks_list.forEach(function(task) {
 						if (task.get('project_id') == project.get('id')) {
-							projects_detailed[item.name].tasks_list[task.get('desc')] = projects_detailed[item.name].tasks_list[task.get('desc')] || {};
-							projects_detailed[item.name].tasks_list[task.get('desc')].time = projects_detailed[item.name].tasks_list[task.get('desc')].time || 0;
-							projects_detailed[item.name].tasks_list[task.get('desc')].time += parseInt(task.get('time'));
+							projects_detailed[item.id].tasks_list[task.get('desc')] = projects_detailed[item.id].tasks_list[task.get('desc')] || {};
+							projects_detailed[item.id].tasks_list[task.get('desc')].time = projects_detailed[item.id].tasks_list[task.get('desc')].time || 0;
+							projects_detailed[item.id].tasks_list[task.get('desc')].time += parseInt(task.get('time'));
 
-							projects_detailed[item.name].sum_time = projects_detailed[item.name].sum_time || 0;
-							projects_detailed[item.name].sum_time += parseInt(task.get('time'));
+							projects_detailed[item.id].sum_time = projects_detailed[item.id].sum_time || 0;
+							projects_detailed[item.id].sum_time += parseInt(task.get('time'));
 
-							projects_detailed[item.name].color = projects_detailed[item.name].color || project.get('color');
+							projects_detailed[item.id].color = projects_detailed[item.id].color || project.get('color');
+
+							projects_detailed[item.id].name = projects_detailed[item.id].name || project.get('name');
 						}
 					});
 
-				    if (value.by_project[item.name]) {
-				    	item.data.push(value.by_project[item.name].sum);
+				    if (value.by_project[item.id]) {
+				    	item.data.push(value.by_project[item.id].sum);
 				    } else {
 				    	item.data.push(0);
 				    }
@@ -147,7 +149,8 @@ $(function(){
 
 				if (!$.isEmptyObject(project.tasks_list)) {
 					pdp_series.data.push({
-		                name: key,
+		                id: key,
+		                name: projects.get(key).get('name'),
 		                y: project.sum_time,
 		                drilldown: key,
 		                color: getProjectColor(project.color)
@@ -163,7 +166,6 @@ $(function(){
 					});
 
 					period_total_time += project.sum_time;
-					console.log('df');
 				}
 			});
 
@@ -246,8 +248,6 @@ $(function(){
 			        drillUpText: '<- Back to {series.name}'
 			    }
 			});
-
-			//console.log(pdp_series_drilldown);
 
 	        // Create the drilldown chart
 	        $('.projects-detailed-drilldown-pie').highcharts({
