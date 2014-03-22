@@ -24,6 +24,13 @@ $(function(){
 	      }
 	    });
 
+		$('.by-projects').on('click', function (e, data) {
+		  console.log('555555555555');
+		});
+
+		$('.by-tags').on('click', function (e, data) {
+		  console.log('343333333');
+		});
 
 		var Filters = Backbone.View.extend({
 	            el: '.filters',
@@ -236,7 +243,11 @@ $(function(){
 	                        color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
 	                        style: {
 	                            textShadow: '0 0 3px black, 0 0 3px black'
-	                        }
+	                        },
+			                formatter: function() {
+			                    if (this.y != '00')  
+			                    	return msToTime(this.y);
+			                }	                        
 	                    }
 	                }
 	            },
