@@ -195,6 +195,7 @@ $(function(){
 
 		function resetVariables () {
 
+			console.log('1');
 			main_button_stop.call()
 				.text('Start')
 				.addClass('start')
@@ -329,6 +330,7 @@ $(function(){
 
 				// set data new started task after current task stop
 				setTimeout(function() {
+					console.log('2');
 					main_button_start
 						.text('Stop')
 						.addClass('stop')
