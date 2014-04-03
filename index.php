@@ -215,17 +215,10 @@ $app->post(
 $app->run();
 
 function getConnection() {
-    // $dbhost="127.0.0.1";
-    // $dbuser="root";
-    // $dbpass="";
-    // $dbname="timer";
-
-    $dbhost="h73.hvosting.ua";
-    $dbuser="user";
-    $dbpass="2KAFS7KC";
-    //TODO add support table prefix
-    //$prefix="timer_";
-    $dbname="auth";
+    $dbhost="127.0.0.1";
+    $dbuser="root";
+    $dbpass="root";
+    $dbname="timer";
 
     $dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpass);  
     $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

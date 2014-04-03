@@ -29,6 +29,7 @@
 		    </tr>
 		  </thead>
 		  <tbody>
+
 		    <% _.each(tasks.reverse(), function(task, key) { %>
 
 		      <tr class="task task<%= task.get('id') %> <%= task.get('active') && 'active' %>" id="<%= task.get('id') %>">
