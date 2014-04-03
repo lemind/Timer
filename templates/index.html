@@ -31,26 +31,27 @@
 		  <tbody>
 
 		    <% _.each(tasks.reverse(), function(task, key) { %>
+			  <% if (task.get('status') != 1) { %>
+			      <tr class="task task<%= task.get('id') %> <%= task.get('active') && 'active' %>" id="<%= task.get('id') %>">
+			        <td><%= task.get('date') %></td>
+			        <td class="desc"><div class="name edited"><%= task.get('desc') %></div></td>
+			        <td><%= task.get('time_str') %></td>
+			        <td class="project">
+			        	<div class="name edited <%= colors['projects'][projects.get(task.get('project_id')).get('color')] %>" task_id="<%= task.get('id') %>"><%= projects.get(task.get('project_id')).get('name') %></div>
+			        </td>
+			        <td><button type="submit" class="btn start btn-default <%= task.get('active') && 'hide' %>">Start</button></td>
+			        <td><button type="submit" class="btn delete btn-default">Delete</button></td>
+			        <td>
+			        	<div class="tags edited" task_id="<%= task.get('id') %>">
+				        	<% _.each(task.get('tags_ids_arr'), function(tag_id) { %>
+				        		<span class="tag <%= colors['tags'][tags.get(tag_id).get('color')] %>"><%= tags.get(tag_id).get('name') %></span>
+				        	<% }); %>
+			        	</div>
+			        </td>
 
-		      <tr class="task task<%= task.get('id') %> <%= task.get('active') && 'active' %>" id="<%= task.get('id') %>">
-		        <td><%= task.get('date') %></td>
-		        <td class="desc"><div class="name edited"><%= task.get('desc') %></div></td>
-		        <td><%= task.get('time_str') %></td>
-		        <td class="project">
-		        	<div class="name edited <%= colors['projects'][projects.get(task.get('project_id')).get('color')] %>" task_id="<%= task.get('id') %>"><%= projects.get(task.get('project_id')).get('name') %></div>
-		        </td>
-		        <td><button type="submit" class="btn start btn-default <%= task.get('active') && 'hide' %>">Start</button></td>
-		        <td><button type="submit" class="btn delete btn-default">Delete</button></td>
-		        <td>
-		        	<div class="tags edited" task_id="<%= task.get('id') %>">
-			        	<% _.each(task.get('tags_ids_arr'), function(tag_id) { %>
-			        		<span class="tag <%= colors['tags'][tags.get(tag_id).get('color')] %>"><%= tags.get(tag_id).get('name') %></span>
-			        	<% }); %>
-		        	</div>
-		        </td>
 
-
-		      </tr>
+			      </tr>
+			  <% } %>
 
 		      <% if (key+1 < tasks.length) if (tasks[key].get('date') != tasks[key + 1].get('date')) { 
 		      	%> <tr class="line"><td colspan="7"></td></tr> <%

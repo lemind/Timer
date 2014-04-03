@@ -25,6 +25,7 @@
 
 	<script src="./js/vendor/jquery-ui-1.10.4.custom.min.js"></script>
 	<script src="./js/vendor/select2-3.4.5/select2.js"></script>
+	<script src="./js/vendor/moment.min.js"></script>
 
 	<script src="./js/models/task.js"></script>
 	<script src="./js/models/project.js"></script>
@@ -48,8 +49,8 @@
 		var projects = new Projects();
 		projects.reset(JSON.parse('{{projects}}'.replace(/&quot;/g,'"')));
 
-		var tasks = new Tasks();
-		tasks.reset(JSON.parse('{{tasks}}'.replace(/&quot;/g,'"')));		
+		//var tasks = new Tasks();
+		//tasks.reset(JSON.parse('{{tasks}}'.replace(/&quot;/g,'"')));		
 	</script>
 
 </head>

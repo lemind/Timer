@@ -9,6 +9,7 @@ $(function(){
 			interval,
 			current_task_id,
 			pause_status = 0,
+			tasks = new Tasks(),
 
 			timer = 				$("#timer"),
 			main_select2_projects = $("#projects"),
@@ -177,19 +178,85 @@ $(function(){
 
 		}
 
-		function timerStart(time_current) {
+		function timerStart(current_time) {
 
 			var start = new Date().getTime();
 
-			time_current = typeof time_current !== 'undefined' ? time_current : 0;
+			current_time = typeof current_time !== 'undefined' ? current_time : 0;
+
+			if (!current_time) {
+
+				var selected_project = main_select2_projects.select2('data'),
+					selected_tags = main_select2_tags.select2('data'),
+					tags_ids_arr = [];
+
+				selected_tags.forEach(function(tag) {
+					if (tag.fl != 'new') tags_ids_arr.push(tag.id);
+				});
+
+				selected_project.id == 0 ? selected_project = last_new_project : selected_project;
+
+				tasks.create(new Task({
+						status:		1,
+						project_id:	selected_project.id, 
+						desc: 		input_task_name.val(),
+						tags:		tags_ids_arr.join()
+					}), { 
+						success: function (model, response) {
+							console.log('new task');
+							console.log(response);
+							current_task_id = response.id;
+						},
+						error: function (model, response) {
+							console.log("error: new task save");
+						}
+					});
+			}
 
 			interval = setInterval(function () {
 				timer_status = 1;
-				time = new Date().getTime() - start + parseInt(time_current);
+				time = new Date().getTime() - start + parseInt(current_time);
 
 				time_str = msToTime(time);
 				main_time.text(time_str);
 			}, 1000); //this will check in every 1 second
+
+		}
+
+		function taskStart (task_id) {
+			var tags_ids = [],
+				current_task_tags = [],
+				task,
+				periods;
+
+			task = tasks.get(task_id);
+
+			main_button_start
+				.text('Stop')
+				.addClass('stop')
+				.removeClass('start');
+
+			input_task_name.val(task.get('desc'));
+			main_select2_projects.select2('data', {id: task.get('project_id'), name: projects.get(task.get('project_id')).get('name')});
+
+			if (task.get('tags')) {
+				tags_ids = task.get('tags').split(',');
+
+				tags_ids.forEach(function(id) {
+					current_task_tags.push(tags.get(id).toJSON());
+				});
+
+				main_select2_tags.select2("data", current_task_tags);
+			}
+
+			if (task.get('status') == 1) {
+				current_task_id = task.get('id');
+				periods = JSON.parse(task.get('periods'));
+				timerStart(moment().diff(moment(periods[periods.length-1].b, "hh:mm:ss")));
+			} else {
+				current_task_id = 0;
+				timerStart();
+			}
 
 		}
 
@@ -229,7 +296,24 @@ $(function(){
 
 				projectsSelect2Init();
 				tagsSelect2Init();
-				var taskListView = new TaskListView({tasks: tasks, projects: projects, tags: tags});
+
+				tasks.fetch({
+					success: function (model, response) {
+						console.log("tasks fetch success");
+
+						var taskListView = new TaskListView({tasks: tasks, projects: projects, tags: tags});
+
+						var active = tasks.find(function(model){ return model.get('status') == 1; });
+
+						if (active) {
+							var periods = JSON.parse(tasks.get(active.get('id')).get('periods'));
+							taskStart(active.get('id'));
+						}						
+					},
+					error: function (model, response) {
+					    console.log("tasks fetch error");
+					}
+				});
 
 				main_button_pause.attr("disabled", true);
 
@@ -312,10 +396,7 @@ $(function(){
 
 			},
 			oldTaskStart: function (ev) {
-				var tags_ids = [],
-					current_task_tags = [],
-					el_task_line,
-					task;
+				var el_task_line
 
 				(pause_status || timer_status) && this.stop();
 
@@ -325,38 +406,13 @@ $(function(){
 
 				current_task_id = el_task_line.attr("id");
 
-				task = tasks.get(current_task_id);
-
 				// set data new started task after current task stop
 				setTimeout(function() {
-					main_button_start
-						.text('Stop')
-						.addClass('stop')
-						.removeClass('start');
+					console.log('2');
 
-					input_task_name.val(task.get('desc'));
-					main_select2_projects.select2('data', {id: task.get('project_id'), name: projects.get(task.get('project_id')).get('name')});
+					taskStart(current_task_id);
 
-					if (task.get('tags')) {
-						tags_ids = task.get('tags').split(',');
-
-						tags_ids.forEach(function(id) {
-							current_task_tags.push(tags.get(id).toJSON());
-						});
-
-						main_select2_tags.select2("data", current_task_tags);
-					}
-
-					if (getFormatDate() > task.get('date')) {
-						current_task_id = 0;
-						timerStart();
-					} else {
-						$(".task" + current_task_id + ' .start').addClass('hide');
-						task.set('active', true);
-						timerStart(task.get('time'));					
-					}
-
-				}, 500);
+				}, 1000);
 
 			},		
 			deleteTask: function (ev) {
