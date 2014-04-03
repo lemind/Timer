@@ -204,7 +204,6 @@ $(function(){
 					}), { 
 						success: function (model, response) {
 							console.log('new task');
-							console.log(response);
 							current_task_id = response.id;
 						},
 						error: function (model, response) {
@@ -252,7 +251,7 @@ $(function(){
 			if (task.get('status') == 1) {
 				current_task_id = task.get('id');
 				periods = JSON.parse(task.get('periods'));
-				timerStart(moment().diff(moment(periods[periods.length-1].b, "hh:mm:ss")));
+				timerStart(moment().diff(moment(periods[periods.length-1].b, "HH:mm:ss")));
 			} else {
 				current_task_id = 0;
 				timerStart();
@@ -348,38 +347,19 @@ $(function(){
 
 				selected_project.id == 0 ? selected_project = last_new_project : selected_project;
 
-				if (current_task_id == 0) {
-
-					tasks.create(new Task({
-							time: 			time, 
-							time_str: 		time_str, 
-							project_id:		selected_project.id, 
-							desc: 			input_task_name.val(),
-							tags:			tags_ids_arr.join(),
-							date:			getFormatDate()
-						}), { 
-							success: function (model, response) {
-								resetVariables();
-							},
-							error: function (model, response) {
-								console.log("error: new task save");
-							}
-						});
-
-				} else {
-					taskUpdate(
-						current_task_id, 
-						{
-							active: 		false,
-							time: 			time,
-							time_str: 		time_str,
-							project_id:		selected_project.id,
-							desc: 			input_task_name.val(),
-							tags:			tags_ids_arr.join()
-						},
-						resetVariables
-					);
-				}
+				taskUpdate(
+					current_task_id, 
+					{
+						time: 		time,
+						time_str: 	time_str,
+						project_id:	selected_project.id,
+						desc: 		input_task_name.val(),
+						tags:		tags_ids_arr.join(),
+						status:		0,
+						end_period:	moment( new Date).format("HH:mm:ss")
+					},
+					resetVariables
+				);
 
 				current_task_id = 0;
 

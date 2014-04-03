@@ -49,24 +49,7 @@ $app->get(
     }
 );
 
-//temp test
-$app->get(
-    '/test',
-    function () use ($app) {
 
-        $begin = new DateTime();
-        echo $begin->format('U = Y-m-d H:i:s') . "<br>";
-        echo $begin->format('H:i:s') . "<br>";
-        $q = array(array('b' => $begin->format('H:i:s')));
-        $qtest = array(array('b' => $begin->format('H:i:s'), 'e' => $begin->format('H:i:s')),
-                       array('b' => $begin->format('H:i:s'), 'e' => $begin->format('H:i:s')));
-
-        echo json_encode($q);
-        echo json_encode($qtest);
-
-
-    }
-);
 
 // create task
 $app->post(
@@ -114,13 +97,31 @@ $app->put(
         {
             $db = getConnection();
 
-            $sql = "update tasks set `time` = :time, `time_str` = :time_str, `desc` = :desc, `project_id` = :project_id, `tags` = :tags, `status` = :status where id=".$id;
+            if (isset($data->end_period)) {
+                if ($data->end_period) {
+                    $sql = "select periods from tasks where id=".$id;
+
+                    $stmt = $db->prepare($sql);
+                    $stmt->execute();
+
+                    $periods = $stmt->fetchColumn();
+
+                    $periods = json_decode($periods);
+                    $periods[count($periods) - 1]->e = $data->end_period;
+                    $periods = json_encode($periods);
+                }
+            } else {
+                $periods = $data->periods;
+            }
+
+            $sql = "update tasks set `time` = :time, `time_str` = :time_str, `desc` = :desc, `project_id` = :project_id, `tags` = :tags, `periods` = :periods, `status` = :status where id=".$id;
             $stmt = $db->prepare($sql);
             $stmt->bindParam(":time", $data->time);
             $stmt->bindParam(":time_str", $data->time_str);
             $stmt->bindParam(":desc", $data->desc);
             $stmt->bindParam(":project_id", $data->project_id);
             $stmt->bindParam(":tags", $data->tags);
+            $stmt->bindParam(":periods", $periods);
             $stmt->bindParam(":status", $data->status);
             $stmt->execute();
 
