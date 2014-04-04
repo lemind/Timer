@@ -49,7 +49,46 @@ $app->get(
     }
 );
 
+//temp test
+$app->get(
+    '/test',
+    function () use ($app) {
 
+        $begin = new DateTime();
+        echo $begin->format('U = Y-m-d H:i:s') . "<br>";
+        echo $begin->format('H:i:s') . "<br>";
+        $q = array(array('b' => $begin->format('H:i:s')));
+        $qtest = array(array('b' => $begin->format('H:i:s'), 'e' => $begin->format('H:i:s')),
+                       array('b' => $begin->format('H:i:s')));
+
+        // $qtest[count($qtest) - 1];
+        // //array_push($qtest[count($qtest) - 1], array('e' => $begin->format('H:i:s')));
+        // $qtest[count($qtest) - 1]['e'] = $begin->format('H:i:s');
+        // echo json_encode($q);
+        // print_r($qtest);
+        // echo('<br>');
+        // echo('<br>');
+        // echo json_encode($qtest);
+
+            $db = getConnection();
+
+                $sql = "select periods from tasks where id=598";
+
+                $stmt = $db->prepare($sql);
+                $stmt->execute();
+
+                $periods = $stmt->fetchColumn();
+
+                var_dump($periods);
+                echo("<br>");
+                echo("<br>");
+
+                $periods = json_decode($periods); 
+                print_r($periods[count($periods) - 1]);       
+
+
+    }
+);
 
 // create task
 $app->post(
@@ -112,6 +151,23 @@ $app->put(
                 }
             } else {
                 $periods = $data->periods;
+            }
+
+            //start old task
+            if ($data->status == 1) {
+                $sql = "select periods from tasks where id=".$id;
+
+                $stmt = $db->prepare($sql);
+                $stmt->execute();
+
+                $periods = $stmt->fetchColumn();
+
+                $periods = json_decode($periods);
+
+                $begin = new DateTime();
+                array_push($periods, array('b' => $begin->format('H:i:s')));
+
+                $periods = json_encode($periods);
             }
 
             $sql = "update tasks set `time` = :time, `time_str` = :time_str, `desc` = :desc, `project_id` = :project_id, `tags` = :tags, `periods` = :periods, `status` = :status where id=".$id;

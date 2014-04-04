@@ -76,6 +76,7 @@ $(function(){
 			    success: function (model, response) {
 			    	typeof cb == "function" && cb.call();
 					console.log('task update');
+					console.log(response);
 			    },
 			    error: function (model, response) {
 			        console.log("error: task update");
@@ -178,7 +179,7 @@ $(function(){
 
 		}
 
-		function timerStart(current_time) {
+		function timerStart(current_time, status) {
 
 			var start = new Date().getTime();
 
@@ -210,6 +211,15 @@ $(function(){
 							console.log("error: new task save");
 						}
 					});
+			} else {
+				if (!status) {
+					taskUpdate(
+						current_task_id, 
+						{
+							status:	1,
+						}
+					);
+				}
 			}
 
 			interval = setInterval(function () {
@@ -251,10 +261,11 @@ $(function(){
 			if (task.get('status') == 1) {
 				current_task_id = task.get('id');
 				periods = JSON.parse(task.get('periods'));
-				timerStart(moment().diff(moment(periods[periods.length-1].b, "HH:mm:ss")));
+
+				timerStart(moment().diff(moment(periods[periods.length-1].b, "HH:mm:ss")) + parseInt(task.get('time')), 1);
 			} else {
-				current_task_id = 0;
-				timerStart();
+				current_task_id = task.get('id');
+				timerStart(task.get('time'), 0);
 			}
 
 		}
@@ -366,7 +377,7 @@ $(function(){
 			},
 			pause: function () {
 
-				timer_status ? clearInterval(interval) : timerStart(time);
+				timer_status ? clearInterval(interval) : timerStart(time, 0);
 
 				main_button_pause.toggleClass('active');
 

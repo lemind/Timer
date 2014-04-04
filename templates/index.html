@@ -31,15 +31,15 @@
 			<tbody>
 
 				<% _.each(tasks.reverse(), function(task, key) { %>
-					<% if (task.get('status') != 1) { %>
-						<tr class="task task<%= task.get('id') %> <%= task.get('active') && 'active' %>" id="<%= task.get('id') %>">
+					<% if (task.get('time') > 0) { %>
+						<tr class="task task<%= task.get('id') %> <%= task.get('status') == 1 && 'active' %>" id="<%= task.get('id') %>">
 						<td><%= task.get('date') %></td>
 						<td class="desc"><div class="name edited"><%= task.get('desc') %></div></td>
 						<td><%= task.get('time_str') %></td>
 						<td class="project">
 							<div class="name edited <%= colors['projects'][projects.get(task.get('project_id')).get('color')] %>" task_id="<%= task.get('id') %>"><%= projects.get(task.get('project_id')).get('name') %></div>
 						</td>
-						<td><button type="submit" class="btn start btn-default <%= task.get('active') && 'hide' %>">Start</button></td>
+						<td><button type="submit" class="btn start btn-default <%= task.get('status') == 1 && 'hide' %>">Start</button></td>
 						<td><button type="submit" class="btn delete btn-default">Delete</button></td>
 						<td>
 							<div class="tags edited" task_id="<%= task.get('id') %>">
