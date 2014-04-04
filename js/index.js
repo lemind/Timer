@@ -265,7 +265,13 @@ $(function(){
 				timerStart(moment().diff(moment(periods[periods.length-1].b, "HH:mm:ss")) + parseInt(task.get('time')), 1);
 			} else {
 				current_task_id = task.get('id');
-				timerStart(task.get('time'), 0);
+
+				//if today start old task else start new task
+				if (task.get('date') == moment(new Date).format("YYYY-MM-DD")) {
+					timerStart(task.get('time'), 0);
+				} else {
+					timerStart(0, 0);
+				}
 			}
 
 		}
