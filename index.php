@@ -58,8 +58,7 @@ $app->post(
 
         $data = json_decode($app->request()->getBody());
 
-        $begin_time = new DateTime();
-        $begin_time_json = json_encode(array(array('b' => $begin_time->format('H:i:s'))));
+        $begin_time_json = json_encode(array(array('b' => $data->begin_period)));
 
         try
         {
@@ -109,8 +108,7 @@ $app->put(
 
                     $periods = json_decode($periods);
 
-                    $begin = new DateTime();
-                    array_push($periods, array('b' => $begin->format('H:i:s')));
+                    array_push($periods, array('b' => $data->begin_period));
 
                     $periods = json_encode($periods);
                 } else {

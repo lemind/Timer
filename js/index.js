@@ -217,11 +217,12 @@ $(function(){
 				selected_project.id == 0 ? selected_project = last_new_project : selected_project;
 
 				tasks.create(new Task({
-						status:		1,
-						project_id:	selected_project.id, 
-						desc: 		input_task_name.val(),
-						tags:		tags_ids_arr.join(),
-						date:		moment(new Date).format("YYYY-MM-DD")
+						status:			1,
+						project_id:		selected_project.id, 
+						desc: 			input_task_name.val(),
+						tags:			tags_ids_arr.join(),
+						date:			moment(new Date).format("YYYY-MM-DD"),
+						begin_period:	moment(new Date).format("HH:mm:ss")
 					}), { 
 						success: function (model, response) {
 							console.log('new task');
@@ -236,8 +237,9 @@ $(function(){
 					taskUpdate(
 						current_task_id, 
 						{
-							status:	1,
-							new_task: 1
+							status:			1,
+							new_task: 		1,
+							begin_period:	moment(new Date).format("HH:mm:ss")
 						}
 					);
 				}
