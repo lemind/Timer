@@ -147,7 +147,10 @@ $(function(){
 			}
 
 			if (task_id)
-				taskUpdate(task_id, {tags: tags_ids_arr.join()});
+				taskUpdate(task_id, {
+					tags: tags_ids_arr.join(),
+					new_task: 0
+				});
 
 		};
 
@@ -165,6 +168,15 @@ $(function(){
 
 				e.val == 0 && createProject(e.object.name);
 
+			}).on("change", function(e) {
+
+				setTimeout(function() {
+					taskUpdate(current_task_id, {
+						project_id: main_select2_projects.select2('data').id,
+						new_task: 0
+					});
+				}, 1000);
+
 			});
 
 		}
@@ -174,6 +186,13 @@ $(function(){
 			main_select2_tags.select2(tags_select2_params).on("select2-selecting", function(e) {
 
 				e.object.fl == 'new' && createTag(e.object.name, main_select2_tags);
+
+			}).on("change", function(e) {
+
+				//TODO fix getting select2 data
+				setTimeout(function() {
+					taskTagsUpdate(current_task_id, main_select2_tags.select2('data'));
+				}, 1000);
 
 			});
 
@@ -217,6 +236,7 @@ $(function(){
 						current_task_id, 
 						{
 							status:	1,
+							new_task: 1
 						}
 					);
 				}
@@ -306,7 +326,8 @@ $(function(){
 				"click .tasks .delete":		"deleteTask",
 				"click .tasks .project":	"editProject",
 				"click .tasks .tags":		"editTags",
-				"click .tasks .desc":		"editDesc" 
+				"click .tasks .desc":		"editDesc",
+				"focusout input.task":		"updateTask"
 			},
 			initialize: function() {
 
@@ -543,8 +564,13 @@ $(function(){
 
 					$(".task" + selected_task_id + " ." + input_desc + " input").val(task.get('desc'));
 				}
-
-			}
+			},
+			updateTask: function (ev) {
+				taskUpdate(current_task_id, {
+					desc: input_task_name.val(),
+					new_task: 0
+				});
+			}				
 
 		});
 

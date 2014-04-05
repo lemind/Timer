@@ -136,8 +136,8 @@ $app->put(
         {
             $db = getConnection();
 
-            if (isset($data->end_period)) {
-                if ($data->end_period) {
+            if ($data->status == 1) {
+                if ($data->new_task == 1) {
                     $sql = "select periods from tasks where id=".$id;
 
                     $stmt = $db->prepare($sql);
@@ -146,28 +146,31 @@ $app->put(
                     $periods = $stmt->fetchColumn();
 
                     $periods = json_decode($periods);
-                    $periods[count($periods) - 1]->e = $data->end_period;
+
+                    $begin = new DateTime();
+                    array_push($periods, array('b' => $begin->format('H:i:s')));
+
                     $periods = json_encode($periods);
+                } else {
+                    $periods = $data->periods;
                 }
             } else {
-                $periods = $data->periods;
-            }
+                if (isset($data->end_period)) {
+                    if ($data->end_period) {
+                        $sql = "select periods from tasks where id=".$id;
 
-            //start old task
-            if ($data->status == 1) {
-                $sql = "select periods from tasks where id=".$id;
+                        $stmt = $db->prepare($sql);
+                        $stmt->execute();
 
-                $stmt = $db->prepare($sql);
-                $stmt->execute();
+                        $periods = $stmt->fetchColumn();
 
-                $periods = $stmt->fetchColumn();
-
-                $periods = json_decode($periods);
-
-                $begin = new DateTime();
-                array_push($periods, array('b' => $begin->format('H:i:s')));
-
-                $periods = json_encode($periods);
+                        $periods = json_decode($periods);
+                        $periods[count($periods) - 1]->e = $data->end_period;
+                        $periods = json_encode($periods);
+                    }
+                } else {
+                    $periods = $data->periods;
+                }                
             }
 
             $sql = "update tasks set `time` = :time, `time_str` = :time_str, `desc` = :desc, `project_id` = :project_id, `tags` = :tags, `periods` = :periods, `status` = :status where id=".$id;
