@@ -130,6 +130,7 @@ $app->put(
     '/task/:id',
     function ($id) use ($app) {
 
+        $without_periods = 0;
         $data = json_decode($app->request()->getBody());
 
         try
@@ -152,7 +153,7 @@ $app->put(
 
                     $periods = json_encode($periods);
                 } else {
-                    $periods = $data->periods;
+                    $without_periods = 1;
                 }
             } else {
                 if (isset($data->end_period)) {
@@ -169,18 +170,25 @@ $app->put(
                         $periods = json_encode($periods);
                     }
                 } else {
-                    $periods = $data->periods;
+                    $without_periods = 1;
                 }                
             }
 
-            $sql = "update tasks set `time` = :time, `time_str` = :time_str, `desc` = :desc, `project_id` = :project_id, `tags` = :tags, `periods` = :periods, `status` = :status where id=".$id;
+            if ($without_periods) {
+                $sql = "update tasks set `time` = :time, `time_str` = :time_str, `desc` = :desc, `project_id` = :project_id, `tags` = :tags, `status` = :status where id=".$id;
+            } else {
+                $sql = "update tasks set `time` = :time, `time_str` = :time_str, `desc` = :desc, `project_id` = :project_id, `tags` = :tags, `periods` = :periods, `status` = :status where id=".$id;                
+            }
+
             $stmt = $db->prepare($sql);
             $stmt->bindParam(":time", $data->time);
             $stmt->bindParam(":time_str", $data->time_str);
             $stmt->bindParam(":desc", $data->desc);
             $stmt->bindParam(":project_id", $data->project_id);
             $stmt->bindParam(":tags", $data->tags);
-            $stmt->bindParam(":periods", $periods);
+            if (!$without_periods) {
+                $stmt->bindParam(":periods", $periods);
+            }
             $stmt->bindParam(":status", $data->status);
             $stmt->execute();
 
