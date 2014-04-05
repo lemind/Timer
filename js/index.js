@@ -9,6 +9,7 @@ $(function(){
 			interval,
 			current_task_id,
 			pause_status = 0,
+			tasks = new Tasks(),
 
 			timer = 				$("#timer"),
 			main_select2_projects = $("#projects"),
@@ -75,6 +76,7 @@ $(function(){
 			    success: function (model, response) {
 			    	typeof cb == "function" && cb.call();
 					console.log('task update');
+					console.log(response);
 			    },
 			    error: function (model, response) {
 			        console.log("error: task update");
@@ -145,7 +147,10 @@ $(function(){
 			}
 
 			if (task_id)
-				taskUpdate(task_id, {tags: tags_ids_arr.join()});
+				taskUpdate(task_id, {
+					tags: tags_ids_arr.join(),
+					new_task: 0
+				});
 
 		};
 
@@ -163,6 +168,15 @@ $(function(){
 
 				e.val == 0 && createProject(e.object.name);
 
+			}).on("change", function(e) {
+
+				setTimeout(function() {
+					taskUpdate(current_task_id, {
+						project_id: main_select2_projects.select2('data').id,
+						new_task: 0
+					});
+				}, 1000);
+
 			});
 
 		}
@@ -173,23 +187,113 @@ $(function(){
 
 				e.object.fl == 'new' && createTag(e.object.name, main_select2_tags);
 
+			}).on("change", function(e) {
+
+				//TODO fix getting select2 data
+				setTimeout(function() {
+					taskTagsUpdate(current_task_id, main_select2_tags.select2('data'));
+				}, 1000);
+
 			});
 
 		}
 
-		function timerStart(time_current) {
+		function timerStart(current_time, status) {
 
 			var start = new Date().getTime();
 
-			time_current = typeof time_current !== 'undefined' ? time_current : 0;
+			current_time = typeof current_time !== 'undefined' ? current_time : 0;
+
+			if (!current_time) {
+
+				var selected_project = main_select2_projects.select2('data'),
+					selected_tags = main_select2_tags.select2('data'),
+					tags_ids_arr = [];
+
+				selected_tags.forEach(function(tag) {
+					if (tag.fl != 'new') tags_ids_arr.push(tag.id);
+				});
+
+				selected_project.id == 0 ? selected_project = last_new_project : selected_project;
+
+				tasks.create(new Task({
+						status:		1,
+						project_id:	selected_project.id, 
+						desc: 		input_task_name.val(),
+						tags:		tags_ids_arr.join(),
+						date:		moment(new Date).format("YYYY-MM-DD")
+					}), { 
+						success: function (model, response) {
+							console.log('new task');
+							current_task_id = response.id;
+						},
+						error: function (model, response) {
+							console.log("error: new task save");
+						}
+					});
+			} else {
+				if (!status) {
+					taskUpdate(
+						current_task_id, 
+						{
+							status:	1,
+							new_task: 1
+						}
+					);
+				}
+			}
 
 			interval = setInterval(function () {
 				timer_status = 1;
-				time = new Date().getTime() - start + parseInt(time_current);
+				time = new Date().getTime() - start + parseInt(current_time);
 
 				time_str = msToTime(time);
 				main_time.text(time_str);
 			}, 1000); //this will check in every 1 second
+
+		}
+
+		function taskStart (task_id) {
+			var tags_ids = [],
+				current_task_tags = [],
+				task,
+				periods;
+
+			task = tasks.get(task_id);
+
+			main_button_start
+				.text('Stop')
+				.addClass('stop')
+				.removeClass('start');
+
+			input_task_name.val(task.get('desc'));
+			main_select2_projects.select2('data', {id: task.get('project_id'), name: projects.get(task.get('project_id')).get('name')});
+
+			if (task.get('tags')) {
+				tags_ids = task.get('tags').split(',');
+
+				tags_ids.forEach(function(id) {
+					current_task_tags.push(tags.get(id).toJSON());
+				});
+
+				main_select2_tags.select2("data", current_task_tags);
+			}
+
+			if (task.get('status') == 1) {
+				current_task_id = task.get('id');
+				periods = JSON.parse(task.get('periods'));
+
+				timerStart(moment().diff(moment(periods[periods.length-1].b, "HH:mm:ss")) + parseInt(task.get('time')), 1);
+			} else {
+				current_task_id = task.get('id');
+
+				//if today start old task else start new task
+				if (task.get('date') == moment(new Date).format("YYYY-MM-DD")) {
+					timerStart(task.get('time'), 0);
+				} else {
+					timerStart(0, 0);
+				}
+			}
 
 		}
 
@@ -224,13 +328,31 @@ $(function(){
 				"click .tasks .delete":		"deleteTask",
 				"click .tasks .project":	"editProject",
 				"click .tasks .tags":		"editTags",
-				"click .tasks .desc":		"editDesc" 
+				"click .tasks .desc":		"editDesc",
+				"focusout input.task":		"updateTask"
 			},
 			initialize: function() {
 
 				projectsSelect2Init();
 				tagsSelect2Init();
-				var taskListView = new TaskListView({tasks: tasks, projects: projects, tags: tags});
+
+				tasks.fetch({
+					success: function (model, response) {
+						console.log("tasks fetch success");
+
+						var taskListView = new TaskListView({tasks: tasks, projects: projects, tags: tags});
+
+						var active = tasks.find(function(model){ return model.get('status') == 1; });
+
+						if (active) {
+							var periods = JSON.parse(tasks.get(active.get('id')).get('periods'));
+							taskStart(active.get('id'));
+						}						
+					},
+					error: function (model, response) {
+					    console.log("tasks fetch error");
+					}
+				});
 
 				main_button_pause.attr("disabled", true);
 
@@ -265,45 +387,26 @@ $(function(){
 
 				selected_project.id == 0 ? selected_project = last_new_project : selected_project;
 
-				if (current_task_id == 0) {
-
-					tasks.create(new Task({
-							time: 			time, 
-							time_str: 		time_str, 
-							project_id:		selected_project.id, 
-							desc: 			input_task_name.val(),
-							tags:			tags_ids_arr.join(),
-							date:			getFormatDate()
-						}), { 
-							success: function (model, response) {
-								resetVariables();
-							},
-							error: function (model, response) {
-								console.log("error: new task save");
-							}
-						});
-
-				} else {
-					taskUpdate(
-						current_task_id, 
-						{
-							active: 		false,
-							time: 			time,
-							time_str: 		time_str,
-							project_id:		selected_project.id,
-							desc: 			input_task_name.val(),
-							tags:			tags_ids_arr.join()
-						},
-						resetVariables
-					);
-				}
+				taskUpdate(
+					current_task_id, 
+					{
+						time: 		time,
+						time_str: 	time_str,
+						project_id:	selected_project.id,
+						desc: 		input_task_name.val(),
+						tags:		tags_ids_arr.join(),
+						status:		0,
+						end_period:	moment( new Date).format("HH:mm:ss")
+					},
+					resetVariables
+				);
 
 				current_task_id = 0;
 
 			},
 			pause: function () {
 
-				timer_status ? clearInterval(interval) : timerStart(time);
+				timer_status ? clearInterval(interval) : timerStart(time, 0);
 
 				main_button_pause.toggleClass('active');
 
@@ -313,10 +416,7 @@ $(function(){
 
 			},
 			oldTaskStart: function (ev) {
-				var tags_ids = [],
-					current_task_tags = [],
-					el_task_line,
-					task;
+				var el_task_line
 
 				(pause_status || timer_status) && this.stop();
 
@@ -326,39 +426,13 @@ $(function(){
 
 				current_task_id = el_task_line.attr("id");
 
-				task = tasks.get(current_task_id);
-
 				// set data new started task after current task stop
 				setTimeout(function() {
 					console.log('2');
-					main_button_start
-						.text('Stop')
-						.addClass('stop')
-						.removeClass('start');
 
-					input_task_name.val(task.get('desc'));
-					main_select2_projects.select2('data', {id: task.get('project_id'), name: projects.get(task.get('project_id')).get('name')});
+					taskStart(current_task_id);
 
-					if (task.get('tags')) {
-						tags_ids = task.get('tags').split(',');
-
-						tags_ids.forEach(function(id) {
-							current_task_tags.push(tags.get(id).toJSON());
-						});
-
-						main_select2_tags.select2("data", current_task_tags);
-					}
-
-					if (getFormatDate() > task.get('date')) {
-						current_task_id = 0;
-						timerStart();
-					} else {
-						$(".task" + current_task_id + ' .start').addClass('hide');
-						task.set('active', true);
-						timerStart(task.get('time'));					
-					}
-
-				}, 500);
+				}, 1000);
 
 			},		
 			deleteTask: function (ev) {
@@ -492,8 +566,13 @@ $(function(){
 
 					$(".task" + selected_task_id + " ." + input_desc + " input").val(task.get('desc'));
 				}
-
-			}
+			},
+			updateTask: function (ev) {
+				taskUpdate(current_task_id, {
+					desc: input_task_name.val(),
+					new_task: 0
+				});
+			}				
 
 		});
 

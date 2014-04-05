@@ -49,27 +49,33 @@ $app->get(
     }
 );
 
+
+
 // create task
 $app->post(
     '/task',
     function () use ($app) {
 
-        //$data = json_decode(file_get_contents('php://input'));
         $data = json_decode($app->request()->getBody());
+
+        $begin_time = new DateTime();
+        $begin_time_json = json_encode(array(array('b' => $begin_time->format('H:i:s'))));
 
         try
         {
             $db = getConnection();
 
-            $sql = "insert into tasks (`time`, `time_str`,`desc`, `project_id`, `tags`, `date`) values(?, ?, ?, ?, ?, ?)";
+            $sql = "insert into tasks (`status`, `desc`, `project_id`, `date`, `tags`, `periods`) values(?, ?, ?, ?, ?, ?)";
+
             $stmt = $db->prepare($sql);
             $stmt->execute(array(
-                $data->time,
-                $data->time_str,
+
+                $data->status,
                 $data->desc,
                 $data->project_id,
+                $data->date,
                 $data->tags,
-                $data->date
+                $begin_time_json,
             ));
             $data->id = $db->lastInsertId();
 
@@ -85,22 +91,69 @@ $app->put(
     '/task/:id',
     function ($id) use ($app) {
 
+        $without_periods = 0;
         $data = json_decode($app->request()->getBody());
 
         try
         {
             $db = getConnection();
 
-            $sql = "update tasks set `time` = :time, `time_str` = :time_str, `desc` = :desc, `project_id` = :project_id, `tags` = :tags where id=".$id;
+            if ($data->status == 1) {
+                if ($data->new_task == 1) {
+                    $sql = "select periods from tasks where id=".$id;
+
+                    $stmt = $db->prepare($sql);
+                    $stmt->execute();
+
+                    $periods = $stmt->fetchColumn();
+
+                    $periods = json_decode($periods);
+
+                    $begin = new DateTime();
+                    array_push($periods, array('b' => $begin->format('H:i:s')));
+
+                    $periods = json_encode($periods);
+                } else {
+                    $without_periods = 1;
+                }
+            } else {
+                if (isset($data->end_period)) {
+                    if ($data->end_period) {
+                        $sql = "select periods from tasks where id=".$id;
+
+                        $stmt = $db->prepare($sql);
+                        $stmt->execute();
+
+                        $periods = $stmt->fetchColumn();
+
+                        $periods = json_decode($periods);
+                        $periods[count($periods) - 1]->e = $data->end_period;
+                        $periods = json_encode($periods);
+                    }
+                } else {
+                    $without_periods = 1;
+                }                
+            }
+
+            if ($without_periods) {
+                $sql = "update tasks set `time` = :time, `time_str` = :time_str, `desc` = :desc, `project_id` = :project_id, `tags` = :tags, `status` = :status where id=".$id;
+            } else {
+                $sql = "update tasks set `time` = :time, `time_str` = :time_str, `desc` = :desc, `project_id` = :project_id, `tags` = :tags, `periods` = :periods, `status` = :status where id=".$id;                
+            }
+
             $stmt = $db->prepare($sql);
             $stmt->bindParam(":time", $data->time);
             $stmt->bindParam(":time_str", $data->time_str);
             $stmt->bindParam(":desc", $data->desc);
             $stmt->bindParam(":project_id", $data->project_id);
             $stmt->bindParam(":tags", $data->tags);
+            if (!$without_periods) {
+                $stmt->bindParam(":periods", $periods);
+            }
+            $stmt->bindParam(":status", $data->status);
             $stmt->execute();
 
-            echo '{"status": "ok"}';
+            echo '{"status_update": "ok"}';
         } catch(PDOException $e) {
             echo '{"error":{"text":'. $e->getMessage() .'}}';
         }
@@ -220,9 +273,6 @@ function getConnection() {
     $dbpass="root";
     $dbname="timer";
 
-    //TODO add support table prefix
-    //$prefix="timer_";
-
     $dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpass);  
     $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     return $dbh;
@@ -281,7 +331,7 @@ function getTasks() {
         $db = getConnection();
 
         $sql = "select * from tasks";
-        //$sql = "select * from tasks order by `id` desc";
+
         $stmt = $db->prepare($sql);
         $stmt->execute();
 
