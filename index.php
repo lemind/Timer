@@ -112,7 +112,7 @@ $app->post(
                 $data->status,
                 $data->desc,
                 $data->project_id,
-                $begin_time->format('Y-m-d'),
+                $data->date,
                 $data->tags,
                 $begin_time_json,
             ));

@@ -220,7 +220,8 @@ $(function(){
 						status:		1,
 						project_id:	selected_project.id, 
 						desc: 		input_task_name.val(),
-						tags:		tags_ids_arr.join()
+						tags:		tags_ids_arr.join(),
+						date:		moment(new Date).format("YYYY-MM-DD")
 					}), { 
 						success: function (model, response) {
 							console.log('new task');
