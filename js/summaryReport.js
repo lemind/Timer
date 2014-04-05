@@ -2,7 +2,8 @@ $(function(){
 
 	if ($(".summary-report").length) {
 
-	    var tasks_filtered;
+	    var tasks_filtered,
+	    	tasks = new Tasks();
 
 		//period
 	    $( "#from" ).attr("placeholder", "period start").datepicker({
@@ -42,12 +43,21 @@ $(function(){
 					var today = new Date(), 
 						week_ago = new Date();
 
-					week_ago.setDate(today.getDate()-6);
+						week_ago.setDate(today.getDate()-6);						
+
+					tasks.fetch({
+						success: function (model, response) {
+							console.log("tasks fetch success");
+
+							filterByDate(week_ago, today);
+						},
+						error: function (model, response) {
+						    console.log("tasks fetch error");
+						}
+					});
 
 					$('#from').datepicker('setDate', week_ago);
 					$('#to').datepicker('setDate', today);
-
-					filterByDate(week_ago, today);					
 	            },      
 	            filter: function () {
 					filterByDate($('#from').datepicker('getDate'), $('#to').datepicker('getDate'));
