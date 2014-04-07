@@ -76,7 +76,6 @@ $(function(){
 			    success: function (model, response) {
 			    	typeof cb == "function" && cb.call();
 					console.log('task update');
-					console.log(response);
 			    },
 			    error: function (model, response) {
 			        console.log("error: task update");

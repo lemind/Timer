@@ -2,8 +2,7 @@ $(function(){
 
 	if ($(".summary-report").length) {
 
-	    var tasks_filtered,
-	    	tasks = new Tasks();
+	    var tasks = new Tasks();
 
 		//period
 	    $( "#from" ).attr("placeholder", "period start").datepicker({
@@ -24,14 +23,6 @@ $(function(){
 	        $( "#from" ).datepicker( "option", "maxDate", selectedDate );
 	      }
 	    });
-
-		$('.by-projects').on('click', function (e, data) {
-		  console.log('555555555555');
-		});
-
-		$('.by-tags').on('click', function (e, data) {
-		  console.log('343333333');
-		});
 
 		var Filters = Backbone.View.extend({
 	            el: '.filters',
@@ -67,13 +58,15 @@ $(function(){
 		var filters = new Filters();
 
 		function filterByDate (start, end) {
-			tasks_filtered = tasks.getTasksByDates(getFormatDate(start), getFormatDate(end));
+			var tasks_filtered = tasks.getTasksByDates(getFormatDate(start), getFormatDate(end));
 
-			renderChart();
+			renderChart(tasks_filtered);
+
+			FormTasksByTags(tasks_filtered);
 		}	
 
 
-		function renderChart () {
+		function renderChart (tasks_filtered) {
 
 		    var tasks_by_days = {},
 		    	day_list = [],
@@ -325,6 +318,27 @@ $(function(){
 	        })
 		}
 
+		function FormTasksByTags (tasks_filtered) {
+
+			var sum_time_tags = [];
+		    //forming task by tags
+			tasks_filtered.forEach(function(task) {
+				task.get('tags_ids_arr').forEach(function(tag_id) {
+					if (!sum_time_tags[tag_id]) {
+						sum_time_tags[tag_id] = parseInt(task.get('time'));
+					} else {
+						sum_time_tags[tag_id] += parseInt(task.get('time'));
+					}
+				});
+				
+			});
+
+			sumTimeTagsView = new SumTimeTagsView({
+					sum_time_tags: sum_time_tags,
+					tags: tags
+				});
+
+		}
 
 	}
 });	

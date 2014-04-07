@@ -1,0 +1,16 @@
+<script type="text/template" id="sum-time-tags-template">
+
+<div class="sum-time-tags">
+
+	<% _.each(sum_time_tags, function(tag, key) { %>
+
+		<div>
+			<span class=""><%= tags.get(key).get('name') %> - </span>
+			<span class=""><%= msToTime(tag) %></span>
+		</div>
+
+	<% }); %>
+</div>
+
+
+</script>
