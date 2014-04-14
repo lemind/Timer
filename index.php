@@ -32,8 +32,24 @@ $app->get(
             array(
                 'tags' => getTags(),
                 'projects' => getProjects(),
-                'tasks' => getTasks(),                
+                'tasks' => getTasks(),
                 'page' => 'summary'
+            )            
+        );
+    }
+);
+
+$app->get(
+    '/weekly',
+    function () use ($app) {
+
+        $app->render(
+            'weekly_report.html',
+            array(
+                'tags' => getTags(),
+                'projects' => getProjects(),
+                'tasks' => getTasks(),
+                'page' => 'weekly'
             )            
         );
     }

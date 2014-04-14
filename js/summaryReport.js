@@ -6,22 +6,26 @@ $(function(){
 
 		//period
 	    $( "#from" ).attr("placeholder", "period start").datepicker({
-	      defaultDate: "+1w",
-	      changeMonth: true,
-	      dateFormat: 'dd.mm.yy',
-	      numberOfMonths: 3,
-	      onClose: function( selectedDate ) {
-	        $( "#to" ).datepicker( "option", "minDate", selectedDate );
-	      }
+			defaultDate: "+1w",
+			changeMonth: true,
+			changeYear: true,
+			dateFormat: 'dd.mm.yy',
+			firstDay: 1,
+			numberOfMonths: 3,
+			onClose: function( selectedDate ) {
+				$( "#to" ).datepicker( "option", "minDate", selectedDate );
+			}
 	    });
 	    $( "#to" ).attr("placeholder", "period end").datepicker({
-	      defaultDate: "+1w",
-	      changeMonth: true,
-	      dateFormat: 'dd.mm.yy',
-	      numberOfMonths: 3,
-	      onClose: function( selectedDate ) {
-	        $( "#from" ).datepicker( "option", "maxDate", selectedDate );
-	      }
+			defaultDate: "+1w",
+			changeMonth: true,
+			changeYear: true,
+			dateFormat: 'dd.mm.yy',
+			firstDay: 1,
+			numberOfMonths: 3,
+			onClose: function( selectedDate ) {
+				$( "#from" ).datepicker( "option", "maxDate", selectedDate );
+			}
 	    });
 
 		var Filters = Backbone.View.extend({
