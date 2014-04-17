@@ -16,8 +16,7 @@ $(function(){
 	    }
 
 	    function getPeriod (selectedDate) {
-	    	var current_day = moment(selectedDate, 'DD.MM.YYYY').format('d'),
-	    		period = {};
+	    	var period = {};
 
 	    	period.start = moment(selectedDate, 'DD.MM.YYYY').isoWeekday(1);
 	    	period.end = moment(selectedDate, 'DD.MM.YYYY').isoWeekday(7);
@@ -72,16 +71,31 @@ $(function(){
 		function filterByDate (start, end) {
 			var	tasks_filtered = tasks.getTasksByDates(start, end);
 
-			FormTasksByProject(tasks_filtered);
+			FormWeekTable(tasks_filtered);
 		}	
 
-		function FormTasksByProject (tasks_filtered) {
-
+		function FormWeekTable (tasks_filtered) {
+			var week_table = {};
 
 			tasks_filtered.forEach(function(task) {
-				console.log(task);
+				var project_id = task.get('project_id'),
+					day = moment(task.get('date'), 'YYYY-MM-DD').format('d');
+
+				week_table[project_id] = week_table[project_id] || {1: {time: 0}, 2: {time: 0}, 3: {time: 0}, 4: {time: 0}, 5: {time: 0}, 6: {time: 0}, 7: {time: 0}};
+
+				if (day == 0) {
+					week_table[project_id][7].time += parseInt(task.get('time'));
+				} else {
+					week_table[project_id][day].time += parseInt(task.get('time'));
+				}
 			});
 
+			console.log(week_table);
+
+			weekTableView = new WeekTableView({
+					week: 		week_table,
+					projects: 	projects
+				});
 		}	
 
 	}
