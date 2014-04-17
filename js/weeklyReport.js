@@ -75,26 +75,32 @@ $(function(){
 		}	
 
 		function FormWeekTable (tasks_filtered) {
-			var week_table = {};
+			var week_table = {},
+				sum_by_day = {1: {time: 0}, 2: {time: 0}, 3: {time: 0}, 4: {time: 0}, 5: {time: 0}, 6: {time: 0}, 7: {time: 0}},
+				sum_week = 0;
 
 			tasks_filtered.forEach(function(task) {
 				var project_id = task.get('project_id'),
 					day = moment(task.get('date'), 'YYYY-MM-DD').format('d');
 
-				week_table[project_id] = week_table[project_id] || {1: {time: 0}, 2: {time: 0}, 3: {time: 0}, 4: {time: 0}, 5: {time: 0}, 6: {time: 0}, 7: {time: 0}};
+				week_table[project_id] = week_table[project_id] || {'week': {1: {time: 0}, 2: {time: 0}, 3: {time: 0}, 4: {time: 0}, 5: {time: 0}, 6: {time: 0}, 7: {time: 0}}, 'sum': {time: 0}};
 
 				if (day == 0) {
-					week_table[project_id][7].time += parseInt(task.get('time'));
+					week_table[project_id].week[7].time += parseInt(task.get('time'));
+					sum_by_day[7].time += parseInt(task.get('time'));
 				} else {
-					week_table[project_id][day].time += parseInt(task.get('time'));
+					week_table[project_id].week[day].time += parseInt(task.get('time'));
+					sum_by_day[day].time += parseInt(task.get('time'));
 				}
+				week_table[project_id].sum.time += parseInt(task.get('time'));
+				sum_week += parseInt(task.get('time'));
 			});
-
-			console.log(week_table);
 
 			weekTableView = new WeekTableView({
 					week: 		week_table,
-					projects: 	projects
+					projects: 	projects,
+					sum_by_day: sum_by_day,
+					sum_week: 	sum_week
 				});
 		}	
 

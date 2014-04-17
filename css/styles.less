@@ -394,18 +394,20 @@ html { body
 					display: inline-block;
 					width: 89%;
 
-					.week-day
+					.week-day,
+					.week-sum
 					{
 						display: inline-block;
 						margin: 10px;
-						width: 10%;
+						width: 9%;
 						text-align: center;
 					}
 				}
 
 			}
 
-			.project-line
+			.project-line,
+			.sum-by-day
 			{
 				padding-left: 10px;
 
@@ -414,26 +416,46 @@ html { body
 					background: #ddd;
 				}
 
-				.project-name
+				.project-name,
+				.sum-label
 				{
 					display: inline-block;
 					width: 10%;
 				}
 
-				.project-week
+				.project-week,
+				.week-line
 				{
 					list-style: none;
 					margin: 0;
 					display: inline-block;
 					width: 89%;
 
-					.project-day
+					.project-day,
+					.project-sum,
+					.sum-day,
+					.sum-week
 					{
 						display: inline-block;
-						margin: 10px;
-						width: 10%;
+						width: 9%;
 						text-align: center;
+						padding: 10px;
 					}
+
+					.project-sum
+					{
+						background: #bbb;
+					}
+				}
+			}
+
+			.sum-by-day
+			{
+				background: #ccc;
+
+				.sum-week
+				{
+					background: #aaa;
 				}
 			}
 		}
