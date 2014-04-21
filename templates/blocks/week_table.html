@@ -1,0 +1,74 @@
+<script type="text/template" id="week-table-template">
+
+<div class="week-table">
+
+	<div class="table-header">
+		<div class="none"></div>
+		<div class="week">
+			<div class="week-day">Mon</div>
+			<div class="week-day">Tue</div>
+			<div class="week-day">Wed</div>
+			<div class="week-day">Thu</div>
+			<div class="week-day">Fri</div>
+			<div class="week-day">Sat</div>
+			<div class="week-day">Sun</div>
+			<div class="week-sum">Sum</div>
+		</div>
+	</div>
+
+	<% _.each(week, function(project, key) { %>
+
+		<div class="project-line">
+
+			<span class="project-name"><%= projects.get(key).get('name') %></span>
+
+			<ul class="project-week">
+
+			<% _.each(project.week, function(day, key) { %>
+				<% if (day.time != 0) { %>
+
+					<li class="project-day">
+						<%= msToTime(day.time) %>
+					</li>
+
+				<% } else { %>
+					<li class="project-day"></li>
+				<% } %>
+			<% }); %>
+
+				<li class="project-sum">
+					<%= msToTime(project.sum.time) %>
+				</li>
+
+			</ul>
+		</div>
+
+	<% }); %>
+
+	<div class="sum-by-day">
+		<div class="sum-label">sum</div>
+
+		<div class="week-line">
+			<% _.each(sum_by_day, function(day, key) { %>
+
+				<div class="sum-day">
+					<% if (day.time != 0) { %>
+
+						<%= msToTime(day.time) %>
+
+					<% } %>
+				</div>
+
+			<% }); %>
+
+			<div class="sum-week">
+				<%= msToTime(sum_week) %>
+			</div>
+
+		</div>
+
+	</div>
+
+</div>
+
+</script>

@@ -96,6 +96,8 @@ $(function(){
 				sum_week += parseInt(task.get('time'));
 			});
 
+			console.log(week_table);
+
 			weekTableView = new WeekTableView({
 					week: 		week_table,
 					projects: 	projects,
