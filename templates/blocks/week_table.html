@@ -24,23 +24,47 @@
 
 			<ul class="project-week">
 
-			<% _.each(project.week, function(day, key) { %>
-				<% if (day.time != 0) { %>
+				<% _.each(project.week, function(day, key) { %>
+					<% if (day.time != 0) { %>
 
-					<li class="project-day">
-						<%= msToTime(day.time) %>
-					</li>
+						<li class="project-day">
+							<%= msToTime(day.time) %>
+						</li>
 
-				<% } else { %>
-					<li class="project-day"></li>
-				<% } %>
-			<% }); %>
+					<% } else { %>
+						<li class="project-day"></li>
+					<% } %>
+				<% }); %>
 
 				<li class="project-sum">
 					<%= msToTime(project.sum.time) %>
 				</li>
 
 			</ul>
+
+			<div class="project-tasks-list">
+				<% _.each(project.tasks_names, function(name, key) { %>
+					<div class="project-task">
+						<span class="project-task-desc"><%= name %></span>
+
+						<% for (var i = 1; i < 8; i++) { %>
+
+							<% if (project.week[i].detailed) { %>
+								<% if (project.week[i].detailed[name]) { %>
+									<% console.log(project.week[i].detailed[name]) %>
+									<span class="project-task-time"><%= msToTime(project.week[i].detailed[name].time) %></span>
+								<% } else { %>
+									<span class="project-task-time"></span>
+								<% } %>
+							<% } else { %>
+								<span class="project-task-time"></span>
+							<% } %>
+
+						<% } %>
+					</div>
+				<% }); %>
+			</div>
+
 		</div>
 
 	<% }); %>

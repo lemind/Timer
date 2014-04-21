@@ -386,13 +386,14 @@ html { body
 				.none
 				{
 					display: inline-block;
-					width: 10%;
+					width: 20%;
 				}
 
 				.week
 				{
 					display: inline-block;
-					width: 89%;
+					margin: 0 0 0 -4px;
+					width: 80%;
 
 					.week-day,
 					.week-sum
@@ -420,7 +421,7 @@ html { body
 				.sum-label
 				{
 					display: inline-block;
-					width: 10%;
+					width: 20%;
 				}
 
 				.project-week,
@@ -429,7 +430,7 @@ html { body
 					list-style: none;
 					margin: 0 0 0 -4px;
 					display: inline-block;
-					width: 90%;
+					width: 80%;
 
 					.project-day,
 					.project-sum,
@@ -445,6 +446,27 @@ html { body
 					.project-sum
 					{
 						background: #bbb;
+					}
+				}
+
+				.project-tasks-list
+				{
+					.project-task
+					{
+						.project-task-desc
+						{
+							display: inline-block;
+							width: 20%;
+							padding: 10px 0;
+						}
+
+						.project-task-time
+						{
+							display: inline-block;
+							width: 9%;
+							text-align: center;
+							padding: 10px 0;
+						}
 					}
 				}
 			}
