@@ -400,9 +400,13 @@ html { body
 					{
 						display: inline-block;
 						padding: 10px;
-						width: 12%;
+						width: 12.5%;
 						text-align: center;
 						box-sizing: border-box;
+						border-left: 1px solid #bbb;
+						margin-left: -4px;
+						min-height: 40px;
+						vertical-align: top;
 					}
 				}
 
@@ -422,7 +426,7 @@ html { body
 				{
 					display: inline-block;
 					width: 20%;
-					padding: 5px;
+					padding: 10px 0 10px 5px;
 					box-sizing: border-box;
 				}
 
@@ -433,6 +437,7 @@ html { body
 					margin: 0 0 0 -4px;
 					display: inline-block;
 					width: 80%;
+					vertical-align: top;
 
 					.project-day,
 					.project-sum,
@@ -440,15 +445,25 @@ html { body
 					.sum-week
 					{
 						display: inline-block;
-						width: 12%;
+						width: 12.5%;
 						text-align: center;
 						padding: 10px;
 						box-sizing: border-box;
+						border-left: 1px solid #bbb;
+						margin-left: -4px;
+						min-height: 40px;
+						vertical-align: top;
+
+						&:last-child
+						{
+							border-left: none;
+						}
 					}
 
 					.project-sum
 					{
 						background: #bbb;
+						border-bottom: 1px solid #ddd;
 					}
 				}
 
@@ -456,6 +471,13 @@ html { body
 				{
 					.project-task
 					{
+						border-bottom: 1px solid #bbb;
+
+						&:first-child
+						{
+							border-top: 1px solid #bbb;
+						}
+
 						.project-task-desc
 						{
 							display: inline-block;
@@ -469,20 +491,26 @@ html { body
 							width: 80%;
 							margin: 0 0 0 -4px;
 							display: inline-block;
+							vertical-align: top;
 
 							.project-task-time,
 							.project-task-sum
 							{
 								display: inline-block;
-								width: 12%;
+								width: 12.5%;
 								text-align: center;
 								padding: 10px 1px;
 								box-sizing: border-box;
+								border-left: 1px solid #bbb;
+								margin-left: -4px;
+								min-height: 40px;
+								vertical-align: top;
 							}
 
 							.project-task-sum
 							{
 								background: #bbb;
+								border-bottom: 1px solid #ddd;
 							}
 						}
 					}

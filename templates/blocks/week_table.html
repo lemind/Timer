@@ -20,7 +20,7 @@
 
 		<div class="project-line">
 
-			<span class="project-name"><%= projects.get(key).get('name') %></span>
+			<a class="project-name" data-toggle="collapse" href="#<%= key %>"><%= projects.get(key).get('name') %></a>
 
 			<ul class="project-week">
 
@@ -42,7 +42,7 @@
 
 			</ul>
 
-			<div class="project-tasks-list">
+			<div id="<%= key %>" class="project-tasks-list collapse">
 				<% _.each(project.sum_by_tasks, function(task, key) { %>
 					<div class="project-task">
 						<span class="project-task-desc"><%= key %></span>
