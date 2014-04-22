@@ -43,16 +43,16 @@
 			</ul>
 
 			<div class="project-tasks-list">
-				<% _.each(project.tasks_names, function(name, key) { %>
+				<% _.each(project.sum_by_tasks, function(task, key) { %>
 					<div class="project-task">
-						<span class="project-task-desc"><%= name %></span>
+						<span class="project-task-desc"><%= key %></span>
 
+						<div class="project-task-line">
 						<% for (var i = 1; i < 8; i++) { %>
 
 							<% if (project.week[i].detailed) { %>
-								<% if (project.week[i].detailed[name]) { %>
-									<% console.log(project.week[i].detailed[name]) %>
-									<span class="project-task-time"><%= msToTime(project.week[i].detailed[name].time) %></span>
+								<% if (project.week[i].detailed[key]) { %>
+									<span class="project-task-time"><%= msToTime(project.week[i].detailed[key].time) %></span>
 								<% } else { %>
 									<span class="project-task-time"></span>
 								<% } %>
@@ -61,6 +61,10 @@
 							<% } %>
 
 						<% } %>
+
+							<span class="project-task-sum"><%= msToTime(task.time) %></span>
+
+						</div>
 					</div>
 				<% }); %>
 			</div>

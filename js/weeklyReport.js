@@ -84,8 +84,8 @@ $(function(){
 					day = moment(task.get('date'), 'YYYY-MM-DD').format('d');
 
 				week_table[project_id] = week_table[project_id] || {'week': {1: {time: 0}, 2: {time: 0}, 3: {time: 0}, 4: {time: 0}, 5: {time: 0}, 6: {time: 0}, 7: {time: 0}}, 'sum': {time: 0}};
-				week_table[project_id].tasks_names = week_table[project_id].tasks_names || [];
-				if (week_table[project_id].tasks_names.indexOf(task.get('desc')) == -1) week_table[project_id].tasks_names.push(task.get('desc'));
+				week_table[project_id].sum_by_tasks = week_table[project_id].sum_by_tasks || {};
+				if (!week_table[project_id].sum_by_tasks[task.get('desc')]) week_table[project_id].sum_by_tasks[task.get('desc')] = {time: 0};
 
 				if (day == 0) {
 					week_table[project_id].week[7].time += parseInt(task.get('time'));
@@ -94,7 +94,6 @@ $(function(){
 					week_table[project_id].week[7].detailed = week_table[project_id].week[7].detailed || {};
 					week_table[project_id].week[7].detailed[task.get('desc')] = week_table[project_id].week[7].detailed[task.get('desc')] || {time: 0};
 					week_table[project_id].week[7].detailed[task.get('desc')].time += parseInt(task.get('time'));
-
 				} else {
 					week_table[project_id].week[day].time += parseInt(task.get('time'));
 					sum_by_day[day].time += parseInt(task.get('time'));
@@ -103,6 +102,8 @@ $(function(){
 					week_table[project_id].week[day].detailed[task.get('desc')] = week_table[project_id].week[day].detailed[task.get('desc')] || {time: 0};
 					week_table[project_id].week[day].detailed[task.get('desc')].time += parseInt(task.get('time'));
 				}
+				//sums
+				week_table[project_id].sum_by_tasks[task.get('desc')].time += parseInt(task.get('time'));
 				week_table[project_id].sum.time += parseInt(task.get('time'));
 				sum_week += parseInt(task.get('time'));
 			});
