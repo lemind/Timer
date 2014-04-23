@@ -71,17 +71,26 @@ function getProjectColor(id) {
 	return colors[id];
 }
 
-function getPath(period) {
-	console.log(period.b);
-	console.log(moment.duration(period.b).asMilliseconds());
-	console.log(period.e);
-	console.log(moment.duration(period.e).asMilliseconds());
+function getPath(period, color) {
+	var period_begin_millsec = moment.duration(period.b).asMilliseconds(),
+		period_end_millsec = moment.duration(period.e).asMilliseconds(),
+		twelve_hours_millsec = 43200000,
+		meridiem = 0, // 0 - am(ante meridiem), 1 - pm(post meridiem), 2 - mix(begin am, end pm)
+		diff_coordinates = 220, //different px between am and pm clock
+		center_x = 100,
+		result_path;
 
-	dig_begin = (moment.duration(period.b).asMilliseconds() * 2 * Math.PI / 43200000) - Math.PI / 2;
-	dig_end = (moment.duration(period.e).asMilliseconds() * 2 * Math.PI / 43200000) - Math.PI / 2;
-	console.log('dig');
-	console.log(dig_begin);
-	console.log(dig_end);
+	if (period_begin_millsec > twelve_hours_millsec && period_end_millsec > twelve_hours_millsec) {
+		meridiem = 1;
+		period_begin_millsec = period_begin_millsec - twelve_hours_millsec;
+		period_end_millsec = period_end_millsec - twelve_hours_millsec;
+	} else if (period_begin_millsec < twelve_hours_millsec && period_end_millsec > twelve_hours_millsec) {
+		meridiem = 2;
+		period_end_millsec = period_end_millsec - twelve_hours_millsec;
+	}
+
+	dig_begin = (period_begin_millsec * 2 * Math.PI / twelve_hours_millsec) - Math.PI / 2;
+	dig_end = (period_end_millsec * 2 * Math.PI / twelve_hours_millsec) - Math.PI / 2;
 
 	x_begin = 100 + 100 * Math.cos(dig_begin);
 	y_begin = 100 + 100 * Math.sin(dig_begin);
@@ -89,18 +98,21 @@ function getPath(period) {
 	x_end = 100 + 100 * Math.cos(dig_end);
 	y_end = 100 + 100 * Math.sin(dig_end);
 
-	console.log('begin');
-	console.log(x_begin);
-	console.log(y_begin);
+	if (meridiem != 2) {
+		if (meridiem == 1) {
+			x_begin += diff_coordinates;
+			x_end += diff_coordinates;
+			center_x += diff_coordinates;
+		}
 
+		result_path = '<path d="M' + center_x + ',100 L' + x_begin + ',' + y_begin + ' A100,100 1 0,1 ' + x_end + ',' + y_end + ' z" fill="' + color + '"></path>';
+	} else {
 
-	console.log('end');
-	console.log(x_end);
-	console.log(y_end);
+		result_path = '<path d="M' + center_x + ',100 L' + x_begin + ',' + y_begin + ' A100,100 1 0,1 100,0 z" fill="' + color + '"></path>';
+		x_end += diff_coordinates;
+		center_x += diff_coordinates;
+		result_path += '<path d="M' + center_x + ',100 L320,0 A100,100 1 0,1 ' + x_end + ',' + y_end + ' z" fill="' + color + '"></path>';
+	}
 
-	console.log('path');
-	console.log('M100,100 L' + x_begin + ',' + y_begin + ' A100,100 1 0,1 ' + x_end + ',' + y_end + ' z');
-	//<path d="M100,100 L100,0 A100,100 1 0,1 150,13.3974596216 z" fill="green"></path>
-
-	//moment.duration(period.b).asMilliseconds();
+	return result_path;
 }
