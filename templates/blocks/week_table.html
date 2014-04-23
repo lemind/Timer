@@ -29,6 +29,20 @@
 
 						<li class="project-day">
 							<%= msToTime(day.time) %>
+
+							<div class="clock-popup">
+								<%= console.log(day.periods) %>
+								<%= console.log(getPath({b: "08:00:00", e: "11:59:59"})) %>
+
+								<svg>
+								  <circle cx="100" cy="100" r="100" fill="#4ec6e4"></circle>
+								  <path d="M100,100 L100,0 A100,100 1 0,1 150,13.3974596216 z" fill="green"></path>
+
+								  <circle cx="320" cy="100" r="100" fill="#4ec6e4"></circle>
+								  <path d="M320,100 L320,0 A100,100 1 0,1 370,13.3974596216 z" fill="green"></path>  
+								</svg>
+
+							</div>
 						</li>
 
 					<% } else { %>

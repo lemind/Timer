@@ -70,3 +70,37 @@ function getProjectColor(id) {
 
 	return colors[id];
 }
+
+function getPath(period) {
+	console.log(period.b);
+	console.log(moment.duration(period.b).asMilliseconds());
+	console.log(period.e);
+	console.log(moment.duration(period.e).asMilliseconds());
+
+	dig_begin = (moment.duration(period.b).asMilliseconds() * 2 * Math.PI / 43200000) - Math.PI / 2;
+	dig_end = (moment.duration(period.e).asMilliseconds() * 2 * Math.PI / 43200000) - Math.PI / 2;
+	console.log('dig');
+	console.log(dig_begin);
+	console.log(dig_end);
+
+	x_begin = 100 + 100 * Math.cos(dig_begin);
+	y_begin = 100 + 100 * Math.sin(dig_begin);
+
+	x_end = 100 + 100 * Math.cos(dig_end);
+	y_end = 100 + 100 * Math.sin(dig_end);
+
+	console.log('begin');
+	console.log(x_begin);
+	console.log(y_begin);
+
+
+	console.log('end');
+	console.log(x_end);
+	console.log(y_end);
+
+	console.log('path');
+	console.log('M100,100 L' + x_begin + ',' + y_begin + ' A100,100 1 0,1 ' + x_end + ',' + y_end + ' z');
+	//<path d="M100,100 L100,0 A100,100 1 0,1 150,13.3974596216 z" fill="green"></path>
+
+	//moment.duration(period.b).asMilliseconds();
+}

@@ -94,6 +94,9 @@ $(function(){
 					week_table[project_id].week[7].detailed = week_table[project_id].week[7].detailed || {};
 					week_table[project_id].week[7].detailed[task.get('desc')] = week_table[project_id].week[7].detailed[task.get('desc')] || {time: 0};
 					week_table[project_id].week[7].detailed[task.get('desc')].time += parseInt(task.get('time'));
+
+					week_table[project_id].week[7].periods = week_table[project_id].week[7].periods || [];
+					week_table[project_id].week[7].periods = week_table[project_id].week[7].periods.concat($.parseJSON(task.get('periods')));					
 				} else {
 					week_table[project_id].week[day].time += parseInt(task.get('time'));
 					sum_by_day[day].time += parseInt(task.get('time'));
@@ -101,6 +104,9 @@ $(function(){
 					week_table[project_id].week[day].detailed = week_table[project_id].week[day].detailed || {};
 					week_table[project_id].week[day].detailed[task.get('desc')] = week_table[project_id].week[day].detailed[task.get('desc')] || {time: 0};
 					week_table[project_id].week[day].detailed[task.get('desc')].time += parseInt(task.get('time'));
+
+					week_table[project_id].week[day].periods = week_table[project_id].week[day].periods || [];
+					week_table[project_id].week[day].periods = week_table[project_id].week[day].periods.concat($.parseJSON(task.get('periods')));
 				}
 				//sums
 				week_table[project_id].sum_by_tasks[task.get('desc')].time += parseInt(task.get('time'));
