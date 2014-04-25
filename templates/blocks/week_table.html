@@ -39,6 +39,9 @@
 										<%= getPath(period, getProjectColor(projects.get(key).get('color'))) %>
 									<% }); %>
 								</svg>
+								<% _.each(day.periods, function(period, k) { %>
+									<div><%= period.b %> - <%= period.e %></div>
+								<% }); %>
 							</div>
 						</li>
 
@@ -94,6 +97,20 @@
 					<% if (day.time != 0) { %>
 
 						<%= msToTime(day.time) %>
+
+						<div class="clock-popup">
+							<svg>
+								<circle cx="100" cy="100" r="100" fill="#4ec6e4"></circle>
+							  	<circle cx="320" cy="100" r="100" fill="#4ec6e4"></circle>
+
+								<% _.each(day.periods_by_proj, function(project, project_id) { %>
+									<% _.each(project, function(period, k) { %>
+										<%= getPath(period, getProjectColor(projects.get(project_id).get('color'))) %>
+									<% }); %>
+								<% }); %>
+							</svg>
+
+						</div>
 
 					<% } %>
 				</div>
