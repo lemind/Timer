@@ -10,6 +10,7 @@ $(function(){
 			current_task_id,
 			pause_status = 0,
 			tasks = new Tasks(),
+			twelve_hours_millsec = 43200000,
 
 			timer = 				$("#timer"),
 			main_select2_projects = $("#projects"),
@@ -242,6 +243,11 @@ $(function(){
 						}
 					);
 				}
+			}
+
+			//if begin time yesterday
+			if (current_time < 0) {
+				current_time = 2*twelve_hours_millsec + current_time;
 			}
 
 			interval = setInterval(function () {

@@ -75,20 +75,38 @@ function getPath(period, color) {
 	if (period.b && period.e) {
 		var period_begin_millsec = moment.duration(period.b).asMilliseconds(),
 			period_end_millsec = moment.duration(period.e).asMilliseconds(),
+			diff_period = period_end_millsec - period_begin_millsec,
 			twelve_hours_millsec = 43200000,
 			meridiem = 0, // 0 - am(ante meridiem), 1 - pm(post meridiem), 2 - mix(begin am, end pm)
 			diff_coordinates = 220, //different px between am and pm clock
 			center_x = 100,
 			result_path,
 			large_arc_flag = 0; //0 - angle < 180, 1 - angle > 180
+			twelve_hours_period_fl = 0; //1 - period = 12h
 
-		if (period_begin_millsec > twelve_hours_millsec && period_end_millsec > twelve_hours_millsec) {
+		if (diff_period < 0) {
+			console.log(diff_period);
+			console.log(period.b + ' - ' + period.e);
+			if (diff_period < -twelve_hours_millsec) {
+				period_end_millsec = 43200000;
+			} else {
+				period_end_millsec = 2*43200000
+			}
+			//period_end_millsec = period_end_millsec + 43200000;
+			console.log('new period end');
+			console.log(period_end_millsec);
+		}
+
+		if (period_begin_millsec > twelve_hours_millsec) {
 			meridiem = 1;
 			period_begin_millsec = period_begin_millsec - twelve_hours_millsec;
 			period_end_millsec = period_end_millsec - twelve_hours_millsec;
 		} else if (period_begin_millsec < twelve_hours_millsec && period_end_millsec > twelve_hours_millsec) {
 			meridiem = 2;
 			period_end_millsec = period_end_millsec - twelve_hours_millsec;
+			if (period_end_millsec == twelve_hours_millsec) {
+				twelve_hours_period_fl = 1;
+			}
 		}
 
 		if (((period_end_millsec - period_begin_millsec > twelve_hours_millsec / 2)) && meridiem != 2) {
@@ -111,13 +129,18 @@ function getPath(period, color) {
 				center_x += diff_coordinates;
 			}
 
-			result_path = '<path d="M' + center_x + ',100 L' + x_begin + ',' + y_begin + ' A100,100 0 ' + large_arc_flag + ' 1 ' + x_end + ',' + y_end + ' z" fill="' + color + '"></path>';
+			result_path = '<path d="M' + center_x + ',100 L' + x_begin + ',' + y_begin + ' A100,100 0 ' + large_arc_flag + ' 1 ' + x_end + ',' + y_end + ' z" fill="' + color + '">' + period.b + ' - ' + period.e + '</path>';
 		} else {
 
-			result_path = '<path d="M' + center_x + ',100 L' + x_begin + ',' + y_begin + ' A100,100 0 ' + large_arc_flag + ' 1 100,0 z" fill="' + color + '"></path>';
-			x_end += diff_coordinates;
-			center_x += diff_coordinates;
-			result_path += '<path d="M' + center_x + ',100 L320,0 A100,100 0 ' + large_arc_flag + ' 1 ' + x_end + ',' + y_end + ' z" fill="' + color + '"></path>';
+			result_path = '<path d="M' + center_x + ',100 L' + x_begin + ',' + y_begin + ' A100,100 0 ' + large_arc_flag + ' 1 100,0 z" fill="' + color + '">' + period.b + ' - ' + period.e + '</path>';
+
+			if (!twelve_hours_period_fl) {
+				x_end += diff_coordinates;
+				center_x += diff_coordinates;
+				result_path += '<path d="M' + center_x + ',100 L320,0 A100,100 0 ' + large_arc_flag + ' 1 ' + x_end + ',' + y_end + ' z" fill="' + color + '">' + period.b + ' - ' + period.e + '</path>';
+			} else {
+				result_path += '<circle cx="320" cy="100" r="100" fill="' + color + '">' + period.b + ' - ' + period.e + '</circle>';
+			}
 		}
 
 		return result_path;
