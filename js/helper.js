@@ -82,6 +82,8 @@ function getPath(period, color) {
 			center_x = 100,
 			result_path,
 			large_arc_fl = 0, //0 - angle < 180, 1 - angle > 180
+			large_arc_fl_am = 0, //0 - angle < 180, 1 - angle > 180
+			large_arc_fl_pm = 0, //0 - angle < 180, 1 - angle > 180
 			twelve_hours_period_fl = 0, //1 - period = 12h
 			period_next_day,
 			multiday_period_fl = 0;
@@ -106,8 +108,12 @@ function getPath(period, color) {
 			meridiem = 2;
 			period_end_millsec = period_end_millsec - twelve_hours_millsec;
 
+			if (period_begin_millsec < twelve_hours_millsec / 2) {
+				large_arc_fl_am = 1;
+			}
+
 			if (period_end_millsec > twelve_hours_millsec / 2) {
-				large_arc_fl = 1;
+				large_arc_fl_pm = 1;
 			}
 
 			if (period_end_millsec == twelve_hours_millsec) {
@@ -115,7 +121,7 @@ function getPath(period, color) {
 			}
 		}
 
-		if (((period_end_millsec - period_begin_millsec > twelve_hours_millsec / 2)) || (0)) {
+		if (((period_end_millsec - period_begin_millsec > twelve_hours_millsec / 2))) {
 			large_arc_fl = 1;
 		}
 
@@ -142,12 +148,12 @@ function getPath(period, color) {
 			}
 		} else {
 
-			result_path = '<path d="M' + center_x + ',100 L' + x_begin + ',' + y_begin + ' A100,100 0 ' + large_arc_fl + ' 1 100,0 z" fill="' + color + '">' + period.b + ' - ' + period.e + '</path>';
+			result_path = '<path d="M' + center_x + ',100 L' + x_begin + ',' + y_begin + ' A100,100 0 ' + large_arc_fl_am + ' 1 100,0 z" fill="' + color + '">' + period.b + ' - ' + period.e + '</path>';
 
 			if (!twelve_hours_period_fl) {
 				x_end += diff_coordinates;
 				center_x += diff_coordinates;
-				result_path += '<path d="M' + center_x + ',100 L320,0 A100,100 0 ' + large_arc_fl + ' 1 ' + x_end + ',' + y_end + ' z" fill="' + color + '">' + period.b + ' - ' + period.e + '///' + period_begin_millsec+ '///' + period_end_millsec + '</path>';
+				result_path += '<path d="M' + center_x + ',100 L320,0 A100,100 0 ' + large_arc_fl_pm + ' 1 ' + x_end + ',' + y_end + ' z" fill="' + color + '">' + period.b + ' - ' + period.e + '///' + period_begin_millsec+ '///' + period_end_millsec + '</path>';
 			} else {
 				result_path += '<circle cx="320" cy="100" r="100" fill="' + color + '">' + period.b + ' - ' + period.e + '</circle>';
 			}

@@ -36,6 +36,7 @@ $(function(){
 
 				$(this).val(period.start.format('DD.MM.YYYY') + ' - ' + period.end.format('DD.MM.YYYY'));
 				filterByDate(period.start.format('YYYY-MM-DD'), period.end.format('YYYY-MM-DD'));
+				pathInfoUpdate();
 			},
 			beforeShow: function() {
 				$('#ui-datepicker-div').addClass('week');
