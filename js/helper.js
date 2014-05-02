@@ -121,7 +121,7 @@ function getPath(period, color) {
 			}
 		}
 
-		if (((period_end_millsec - period_begin_millsec > twelve_hours_millsec / 2))) {
+		if (((period_end_millsec - period_begin_millsec > twelve_hours_millsec / 2)) || (multiday_period_fl && (period_begin_millsec < twelve_hours_millsec / 2))) {
 			large_arc_fl = 1;
 		}
 

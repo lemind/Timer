@@ -39,9 +39,6 @@
 										<%= getPath(period, getProjectColor(projects.get(key).get('color'))) %>
 									<% }); %>
 								</svg>
-								<% _.each(day.periods, function(period, k) { %>
-									<div><%= period.b %> - <%= period.e %></div>
-								<% }); %>
 							</div>
 						</li>
 
@@ -65,13 +62,21 @@
 						<% for (var i = 1; i < 8; i++) { %>
 
 							<% if (project.week[i].detailed) { %>
-								<% if (project.week[i].detailed[key]) { %>
-									<span class="project-task-time"><%= msToTime(project.week[i].detailed[key].time) %></span>
+								<% if ((project.week[i].detailed[key]) && (project.week[i].detailed[key].time != 0)) { %>
+
+									<span class="project-task-time">
+										<%= msToTime(project.week[i].detailed[key].time) %>
+									</span>
+
 								<% } else { %>
+
 									<span class="project-task-time"></span>
+
 								<% } %>
 							<% } else { %>
+
 								<span class="project-task-time"></span>
+
 							<% } %>
 
 						<% } %>
