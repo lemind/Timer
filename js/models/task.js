@@ -6,7 +6,7 @@ window.Task = Backbone.Model.extend({
 
 window.Tasks = Backbone.Collection.extend({
 
-	initialize: function() { 
+	initialize: function(options) { 
 
 		this.on('change:tags', this.createTagsIdsArr, this);
 		this.on('add', this.createTagsIdsArr, this);
@@ -51,7 +51,21 @@ window.Tasks = Backbone.Collection.extend({
 		return gf;
 	},
 
+	fetch: function(options) {
+		options || (options = {});
+		this.data = (options.data || {});
+		options.data = {};
+
+		return Backbone.Collection.prototype.fetch.call(this, options);
+	},
+
     model: Task,
-    url: 'tasks'
+	url: function () {
+		if (this.data.start && this.data.end) {
+			return 'tasks/' + this.data.start + '/' + this.data.end;
+		} else {
+			return 'tasks';
+		}
+	}
 
 });

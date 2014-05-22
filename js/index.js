@@ -56,6 +56,8 @@ $(function(){
 			    }
 			};
 
+		tasks.comparator = 'date'; //sort by date
+
 		$('html').click(function() {
 			if ($("." + project_select2_str).length > 0) {
 				$("." + project_select2_str).remove();
@@ -336,7 +338,8 @@ $(function(){
 				"click .tasks .project":	"editProject",
 				"click .tasks .tags":		"editTags",
 				"click .tasks .desc":		"editDesc",
-				"focusout input.task":		"updateTask"
+				"focusout input.task":		"updateTask",
+				"click .btn.more":			"moreTasks"
 			},
 			initialize: function() {
 
@@ -354,7 +357,7 @@ $(function(){
 						if (active) {
 							var periods = JSON.parse(tasks.get(active.get('id')).get('periods'));
 							taskStart(active.get('id'));
-						}						
+						}
 					},
 					error: function (model, response) {
 					    console.log("tasks fetch error");
@@ -579,8 +582,24 @@ $(function(){
 					desc: input_task_name.val(),
 					new_task: 0
 				});
-			}				
+			},
+			moreTasks: function (ev) {
+				var date_last_day = tasks.at(0).get('date');
 
+				tasks.fetch({
+					data: {start: 	moment(date_last_day, "YYYY-MM-DD").subtract('days', 7).format("YYYY-MM-DD"), 
+						   end: 	date_last_day},
+					remove: false,
+					success: function (model, response) {
+						console.log("tasks fetch success");
+
+						var taskListView = new TaskListView({tasks: tasks, projects: projects, tags: tags});
+					},
+					error: function (model, response) {
+					    console.log("tasks fetch error");
+					}
+				});
+			}
 		});
 
 		var timer = new Timer();
