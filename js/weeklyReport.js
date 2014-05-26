@@ -35,8 +35,21 @@ $(function(){
 				var period = getPeriod(selectedDate);
 
 				$(this).val(period.begin.format('DD.MM.YYYY') + ' - ' + period.end.format('DD.MM.YYYY'));
-				filterByDate(period.begin.format('YYYY-MM-DD'), period.end.format('YYYY-MM-DD'));
-				pathInfoUpdate();
+
+				tasks.fetch({
+					data: {begin: 	period.begin.format('YYYY-MM-DD'), 
+						   end: 	period.end.format('YYYY-MM-DD')},
+					remove: false,
+					success: function (model, response) {
+						console.log("tasks fetch success");
+						filterByDate(period.begin.format('YYYY-MM-DD'), period.end.format('YYYY-MM-DD'));
+						pathInfoUpdate();
+					},
+					error: function (model, response) {
+					    console.log("tasks fetch error");
+					}
+				});
+
 			},
 			beforeShow: function() {
 				$('#ui-datepicker-div').addClass('week');

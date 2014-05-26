@@ -3,6 +3,7 @@ $(function(){
 	if ($(".summary-report").length) {
 
 	    var tasks = new Tasks();
+	    tasks.comparator = 'date'; //sort by date
 
 		//period
 	    $( "#from" ).attr("placeholder", "period start").datepicker({
@@ -55,7 +56,20 @@ $(function(){
 					$('#to').datepicker('setDate', today);
 	            },      
 	            filter: function () {
-					filterByDate($('#from').datepicker('getDate'), $('#to').datepicker('getDate'));
+
+					tasks.fetch({
+						data: {begin: 	moment($('#from').datepicker('getDate')).format("YYYY-MM-DD"), 
+							   end: 	moment($('#to').datepicker('getDate')).format("YYYY-MM-DD")},
+						remove: false,
+						success: function (model, response) {
+							console.log("tasks fetch success");
+							filterByDate($('#from').datepicker('getDate'), $('#to').datepicker('getDate'));
+						},
+						error: function (model, response) {
+						    console.log("tasks fetch error");
+						}
+					});
+
 				}
 			});
 

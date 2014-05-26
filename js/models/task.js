@@ -61,8 +61,8 @@ window.Tasks = Backbone.Collection.extend({
 
     model: Task,
 	url: function () {
-		if (this.data.start && this.data.end) {
-			return 'tasks/' + this.data.start + '/' + this.data.end;
+		if (this.data.begin && this.data.end) {
+			return 'tasks/' + this.data.begin + '/' + this.data.end;
 		} else {
 			return 'tasks';
 		}

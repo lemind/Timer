@@ -57,10 +57,10 @@ $app->get(
 
 // get tasks
 $app->get(
-    '/tasks(/:start/:end)',
-    function ($start = NULL, $end = NULL) use ($app) {
+    '/tasks(/:begin/:end)',
+    function ($begin = NULL, $end = NULL) use ($app) {
 
-        echo getTasks($start, $end);
+        echo getTasks($begin, $end);
 
     }
 );
@@ -338,17 +338,17 @@ function getProjects() {
 
 }
 
-function getTasks($start_period = NULL, $end_period = NULL) {
+function getTasks($begin_period = NULL, $end_period = NULL) {
 
     try
     {
         $db = getConnection();
 
-        if (!$start_period && !$end_period) {
-            $start_period = date('Y-m-d', strtotime("now -7 days"));
-            $sql = "select * from tasks where `date` >= '" . $start_period . "'";
+        if (!$begin_period && !$end_period) {
+            $begin_period = date('Y-m-d', strtotime("now -7 days"));
+            $sql = "select * from tasks where `date` >= '" . $begin_period . "'";
         } else {
-            $sql = "select * from tasks where `date` >= '" . $start_period . "' AND `date` < '" . $end_period . "'";
+            $sql = "select * from tasks where `date` >= '" . $begin_period . "' AND `date` < '" . $end_period . "'";
         }
 
         $stmt = $db->prepare($sql);

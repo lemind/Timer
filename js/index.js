@@ -20,6 +20,7 @@ $(function(){
 			main_button_start = 	$(".main button.start")
 			main_button_stop = 		(function() { return $(".main button.stop"); }),
 			main_button_pause = 	$(".main button.pause"),
+			spin = 					$(".spin"),
 			project_select2_str = 	'project-select2',
 			tags_select2 = 			'tags-select2',
 			input_desc = 			'input_desc',
@@ -546,7 +547,6 @@ $(function(){
 
 			},
 			editDesc: function (ev) {
-
 				var el_task_line = $(ev.target),
 					task,
 					input;
@@ -584,16 +584,16 @@ $(function(){
 				});
 			},
 			moreTasks: function (ev) {
+				spin.css('display', 'block');
 				var date_last_day = tasks.at(0).get('date');
 
 				tasks.fetch({
-					data: {start: 	moment(date_last_day, "YYYY-MM-DD").subtract('days', 7).format("YYYY-MM-DD"), 
+					data: {begin: 	moment(date_last_day, "YYYY-MM-DD").subtract('days', 7).format("YYYY-MM-DD"), 
 						   end: 	date_last_day},
 					remove: false,
 					success: function (model, response) {
 						console.log("tasks fetch success");
-
-						var taskListView = new TaskListView({tasks: tasks, projects: projects, tags: tags});
+						spin.css('display', 'none');
 					},
 					error: function (model, response) {
 					    console.log("tasks fetch error");
