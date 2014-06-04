@@ -65,7 +65,33 @@ $app->get(
     }
 );
 
+// get tasks descs
+$app->get(
+    '/descstasks',
+    function () use ($app) {
 
+        try
+        {
+            $db = getConnection();
+
+            $sql = "select DISTINCT `desc` from tasks";
+
+            $stmt = $db->prepare($sql);
+            $stmt->execute();
+
+            $tasks = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+            $db = null;
+
+            $result = json_encode($tasks);
+        } catch(PDOException $e) {
+            $result = '{"error":{"text":'. $e->getMessage() .'}}';
+        }
+
+        echo $result;
+
+    }
+);
 
 // create task
 $app->post(

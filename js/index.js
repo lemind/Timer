@@ -347,6 +347,31 @@ $(function(){
 				projectsSelect2Init();
 				tagsSelect2Init();
 
+$(".task-desc").select2({
+	minimumInputLength: 2,
+	tags : [],
+	ajax: {
+		url: 'descstasks',
+		dataType: 'json',
+		type: "GET",
+		quietMillis: 50,
+		data: function ( term ) { 
+			return { term: term }; 
+		},
+		results: function (data) {
+			return { 
+				results : $.map(data, function (item) { 
+					return { 
+						text:item.completeName, 
+						slug:item.slug, 
+						id:item.id 
+					} 
+				})
+			}
+	    }
+	}
+});
+
 				tasks.fetch({
 					success: function (model, response) {
 						console.log("tasks fetch success");
