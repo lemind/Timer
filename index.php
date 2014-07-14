@@ -345,8 +345,17 @@ function getTasks($begin_period = NULL, $end_period = NULL) {
         $db = getConnection();
 
         if (!$begin_period && !$end_period) {
-            $begin_period = date('Y-m-d', strtotime("now -7 days"));
+
+            $sql = "select * from tasks order by id desc limit 1";
+            $stmt = $db->prepare($sql);
+            $stmt->execute();
+
+            $last_tasks = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+            $begin_period = date('Y-m-d', strtotime($last_tasks[0]->date . " -7 days"));
+
             $sql = "select * from tasks where `date` >= '" . $begin_period . "'";
+            //echo($sql);
         } else {
             $sql = "select * from tasks where `date` >= '" . $begin_period . "' AND `date` < '" . $end_period . "'";
         }
