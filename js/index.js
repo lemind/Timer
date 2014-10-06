@@ -15,6 +15,7 @@ $(function(){
 			timer = 				$("#timer"),
 			main_select2_projects = $("#projects"),
 			main_select2_tags = 	$("#tags"),
+			search_task = 			$(".search-task"),
 			main_time = 			$("span.time"),
 			input_task_name = 		$("input.task"),
 			main_button_start = 	$(".main button.start")
@@ -328,6 +329,42 @@ $(function(){
 			timer_status = 0;
 		}
 
+		function resetSearchSelect2 () {
+			search_task.select2('data', '');
+		}
+
+		function taskStop () {
+			main_button_pause.attr("disabled", true);
+
+			var selected_project = main_select2_projects.select2('data'),
+				selected_tags = main_select2_tags.select2('data'),
+				tags_ids_arr = [];
+
+			selected_tags.forEach(function(tag) {
+				if (tag.fl != 'new') tags_ids_arr.push(tag.id);
+			});
+
+			clearInterval(interval);
+
+			selected_project.id == 0 ? selected_project = last_new_project : selected_project;
+
+			taskUpdate(
+				current_task_id, 
+				{
+					time: 		time,
+					time_str: 	time_str,
+					project_id:	selected_project.id,
+					desc: 		input_task_name.val(),
+					tags:		tags_ids_arr.join(),
+					status:		0,
+					end_period:	moment( new Date).format("HH:mm:ss")
+				},
+				resetVariables
+			);
+
+			current_task_id = 0;
+		}
+
 		var Timer = Backbone.View.extend({
 			el: timer, 
 			events: {
@@ -343,34 +380,50 @@ $(function(){
 				"click .btn.more":			"moreTasks"
 			},
 			initialize: function() {
-
 				projectsSelect2Init();
 				tagsSelect2Init();
 
-$(".task-desc").select2({
-	minimumInputLength: 2,
-	tags : [],
-	ajax: {
-		url: 'descstasks',
-		dataType: 'json',
-		type: "GET",
-		quietMillis: 50,
-		data: function ( term ) { 
-			return { term: term }; 
-		},
-		results: function (data) {
-			return { 
-				results : $.map(data, function (item) { 
-					return { 
-						text:item.completeName, 
-						slug:item.slug, 
-						id:item.id 
-					} 
-				})
-			}
-	    }
-	}
-});
+				search_task.select2({
+					minimumInputLength: 2,
+					multiple: false,
+					ajax: {
+						url: 'descstasks',
+						dataType: 'json',
+						type: "POST",
+						quietMillis: 50,
+						data: function ( term ) { 
+							return JSON.stringify({term: term}); 
+						},
+						results: function (data) {
+							return { 
+								results : $.map(data, function (item) { 
+									var tags_arr = item.tags.split(","),
+										tags_names = '';
+
+									tags_arr.forEach(function(tag) {
+										tags_names += tags.get(tag).get('name') + ', ';
+									});
+
+									return { 
+										text: item.desc + ' [' + tags_names.substring(0, tags_names.length - 2) + ']', 
+										id:item.id,
+										task: item 
+									} 
+								})
+							}
+					    }
+					}
+				}).on("select2-selecting", function(e) {
+					taskStop();
+
+					e.object.task.search = true;
+					tasks.push(e.object.task);
+
+					setTimeout(function() {
+						resetSearchSelect2();
+						taskStart(e.object.task.id);
+					}, 1000);
+				});
 
 				tasks.fetch({
 					success: function (model, response) {
@@ -409,36 +462,7 @@ $(".task-desc").select2({
 
 			},
 			stop: function () {
-				main_button_pause.attr("disabled", true);
-
-				var selected_project = main_select2_projects.select2('data'),
-					selected_tags = main_select2_tags.select2('data'),
-					tags_ids_arr = [];
-
-				selected_tags.forEach(function(tag) {
-					if (tag.fl != 'new') tags_ids_arr.push(tag.id);
-				});
-
-				clearInterval(interval);
-
-				selected_project.id == 0 ? selected_project = last_new_project : selected_project;
-
-				taskUpdate(
-					current_task_id, 
-					{
-						time: 		time,
-						time_str: 	time_str,
-						project_id:	selected_project.id,
-						desc: 		input_task_name.val(),
-						tags:		tags_ids_arr.join(),
-						status:		0,
-						end_period:	moment( new Date).format("HH:mm:ss")
-					},
-					resetVariables
-				);
-
-				current_task_id = 0;
-
+				taskStop();
 			},
 			pause: function () {
 

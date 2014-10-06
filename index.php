@@ -66,15 +66,17 @@ $app->get(
 );
 
 // get tasks descs
-$app->get(
+$app->post(
     '/descstasks',
     function () use ($app) {
+
+        $data = json_decode($app->request()->getBody());
 
         try
         {
             $db = getConnection();
 
-            $sql = "select DISTINCT `desc` from tasks";
+            $sql = "select * from tasks where `desc` like '%" . $data->term . "%' GROUP BY `desc`,`tags`";
 
             $stmt = $db->prepare($sql);
             $stmt->execute();
