@@ -414,7 +414,7 @@ $(function(){
 					    }
 					}
 				}).on("select2-selecting", function(e) {
-					taskStop();
+					timer_status && taskStop();
 
 					e.object.task.search = true;
 					tasks.push(e.object.task);
