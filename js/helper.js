@@ -50,8 +50,8 @@ function getFormatDate(date) {
 		yyyy = date.getFullYear();
 
 	dd = dd < 10 ? '0' + dd : dd;
-	mm = mm < 10 ? '0' + mm : dd;
-	
+	mm = mm < 10 ? '0' + mm : mm;
+
 	return yyyy + '-' + mm + '-' + dd;
 }
 

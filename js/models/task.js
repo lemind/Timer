@@ -43,8 +43,8 @@ window.Tasks = Backbone.Collection.extend({
 		var gf = this.models.filter(function(model) {
 
 			return (
-				model.get('date') >= date_start &&
-				model.get('date') <= date_end
+				moment(model.get('date'), 'YYYY-MM-DD') >= moment(date_start, 'YYYY-MM-DD') &&
+				moment(model.get('date'), 'YYYY-MM-DD') <= moment(date_end, 'YYYY-MM-DD')
 			)
 		});
 
