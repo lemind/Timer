@@ -8,7 +8,6 @@ $(function(){
 			timer_status,
 			interval,
 			current_task_id,
-			pause_status = 0,
 			tasks = new Tasks(),
 			twelve_hours_millsec = 43200000,
 
@@ -20,7 +19,6 @@ $(function(){
 			input_task_name = 		$("input.task"),
 			main_button_start = 	$(".main button.start")
 			main_button_stop = 		(function() { return $(".main button.stop"); }),
-			main_button_pause = 	$(".main button.pause"),
 			spin = 					$(".spin"),
 			project_select2_str = 	'project-select2',
 			tags_select2 = 			'tags-select2',
@@ -316,9 +314,6 @@ $(function(){
 				.addClass('start')
 				.removeClass('stop');
 
-			pause_status && main_button_pause.removeClass('active');
-			pause_status = 0;
-
 			input_task_name.val('');
 			main_time.text('');
 			main_select2_projects.select2('data', '');
@@ -334,8 +329,6 @@ $(function(){
 		}
 
 		function taskStop () {
-			main_button_pause.attr("disabled", true);
-
 			var selected_project = main_select2_projects.select2('data'),
 				selected_tags = main_select2_tags.select2('data'),
 				tags_ids_arr = [];
@@ -370,7 +363,6 @@ $(function(){
 			events: {
 				"click .main .start": 		"start", 
 				"click .main .stop": 		"stop", 
-				"click .main .pause": 		"pause", 
 				"click .tasks .start": 		"oldTaskStart",
 				"click .tasks .delete":		"deleteTask",
 				"click .tasks .project":	"editProject",
@@ -443,12 +435,8 @@ $(function(){
 					}
 				});
 
-				main_button_pause.attr("disabled", true);
-
 			},		
 			start: function () {
-				main_button_pause.attr("disabled", false);
-
 				!main_select2_projects.select2('data') && main_select2_projects.select2('data', {id: 1, name: 'no project'});
 
 				main_button_start
@@ -464,23 +452,10 @@ $(function(){
 			stop: function () {
 				taskStop();
 			},
-			pause: function () {
-
-				timer_status ? clearInterval(interval) : timerStart(time, 0);
-
-				main_button_pause.toggleClass('active');
-
-				timer_status = !timer_status;
-
-				pause_status = 1;
-
-			},
 			oldTaskStart: function (ev) {
 				var el_task_line
 
-				(pause_status || timer_status) && this.stop();
-
-				main_button_pause.attr("disabled", false);
+				timer_status && this.stop();
 
 				el_task_line = $(ev.target).parents('.task');
 
