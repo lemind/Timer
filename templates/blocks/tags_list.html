@@ -1,0 +1,16 @@
+<script type="text/template" id="tags-edit">
+
+<div class="tags-edit-list">
+
+	<% _.each(tags.models, function(tag, key) { %>
+
+		<div class="tag-item">
+			<span class="tag-color sc-bg <%= colors['tags'][tag.get('color')] %>"></span>
+			<a class="tag-name" tag-id="<%= tag.get('id') %>"><%= tag.get('name') %></a>
+		</div>
+
+	<% }); %>
+
+</div>
+
+</script>

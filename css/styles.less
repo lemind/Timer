@@ -64,6 +64,18 @@
 @project8: #8B008B;
 @project9: #808000;
 
+.sc-bg {
+	&.lightblue {background: @lightblue;}
+	&.lightcoral {background: @lightcoral;}
+	&.lightgreen {background: @lightgreen;}
+	&.lightsteelblue {background: @lightsteelblue;}
+	&.lightpink {background: @lightpink;}
+	&.lightsalmon {background: @lightsalmon;}
+	&.lightseagreen {background: @lightseagreen;}
+	&.lightslategray {background: @lightslategray;}
+	&.lightgray {background: @lightgray;}
+}
+
 .spin {
 	position: fixed;
 	top: 50%;
@@ -582,6 +594,52 @@ html { body
 	}
 
 	/* Weekly-report - end */
+
+	/* Tags edit - start */
+	.tags-edit {
+		.content;
+
+		.tags-edit-list {
+			.tag-item {
+				.tag-color {
+					width: 20px;
+					height: 20px;
+					display: inline-block;
+					margin-right: 10px;
+					margin-top: 5px;
+				}
+				.edit-tag-block {
+					display: inline-block;
+					
+					.input-edit-tag {
+						display: inline-block;
+						margin-left: 15px;
+					}
+
+					.select-colors-list {
+						display: inline-block;
+						vertical-align: middle;
+						margin-left: 15px;
+						margin-right: 15px;
+
+						.select-color {
+							width: 20px;
+							height: 20px;
+							display: inline-block;
+							margin-left: 2px;
+							border: 2px solid #ebebeb;
+							cursor: pointer;
+
+							&.active {
+								border: 2px solid #000;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	/* Tags edit - end */
 
 	/* Footer - start */
 

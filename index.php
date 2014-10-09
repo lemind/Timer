@@ -50,7 +50,7 @@ $app->get(
                 'projects' => getProjects(),
                 'tasks' => getTasks(),
                 'page' => 'weekly'
-            )            
+            )
         );
     }
 );
@@ -272,6 +272,48 @@ $app->get(
     }
 );
 
+// update
+$app->put(
+    '/tag/:id',
+    function ($id) use ($app) {
+
+        $without_periods = 0;
+        $data = json_decode($app->request()->getBody());
+
+        try
+        {
+            $db = getConnection();
+
+            $sql = "update tags set `name` = :name, `color` = :color where id=".$id;
+
+            $stmt = $db->prepare($sql);
+            $stmt->bindParam(":name", $data->name);
+            $stmt->bindParam(":color", $data->color);
+            $stmt->execute();
+
+            echo '{"status_update": "ok"}';
+        } catch(PDOException $e) {
+            echo '{"error":{"text":'. $e->getMessage() .'}}';
+        }
+
+    }
+);
+
+// get tags
+$app->get(
+    '/tagsedit',
+    function () use ($app) {
+
+        $app->render(
+            'tags_edit.html',
+            array(
+                'tags' => getTags(),
+                'projects' => getProjects(),
+            )
+        );
+
+    }
+);
 
 // create tag 
 $app->post(
