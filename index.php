@@ -262,6 +262,48 @@ $app->post(
     }
 );
 
+// update project
+$app->put(
+    '/project/:id',
+    function ($id) use ($app) {
+
+        $data = json_decode($app->request()->getBody());
+
+        try
+        {
+            $db = getConnection();
+
+            $sql = "update projects set `name` = :name, `color` = :color where id=".$id;
+
+            $stmt = $db->prepare($sql);
+            $stmt->bindParam(":name", $data->name);
+            $stmt->bindParam(":color", $data->color);
+            $stmt->execute();
+
+            echo '{"status_update": "ok"}';
+        } catch(PDOException $e) {
+            echo '{"error":{"text":'. $e->getMessage() .'}}';
+        }
+
+    }
+);
+
+// get projects
+$app->get(
+    '/projectsedit',
+    function () use ($app) {
+
+        $app->render(
+            'projects_edit.html',
+            array(
+                'tags' => getTags(),
+                'projects' => getProjects(),
+            )
+        );
+
+    }
+);
+
 // get tags
 $app->get(
     '/tags',
@@ -277,7 +319,6 @@ $app->put(
     '/tag/:id',
     function ($id) use ($app) {
 
-        $without_periods = 0;
         $data = json_decode($app->request()->getBody());
 
         try

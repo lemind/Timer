@@ -74,6 +74,16 @@
 	&.lightseagreen {background: @lightseagreen;}
 	&.lightslategray {background: @lightslategray;}
 	&.lightgray {background: @lightgray;}
+
+	&.project1 {background: @project1;}
+	&.project2 {background: @project2;}
+	&.project3 {background: @project3;}
+	&.project4 {background: @project4;}
+	&.project5 {background: @project5;}
+	&.project6 {background: @project6;}
+	&.project7 {background: @project7;}
+	&.project8 {background: @project8;}
+	&.project9 {background: @project9;}
 }
 
 .spin {
@@ -610,7 +620,7 @@ html { body
 				}
 				.edit-tag-block {
 					display: inline-block;
-					
+
 					.input-edit-tag {
 						display: inline-block;
 						margin-left: 15px;
@@ -640,6 +650,52 @@ html { body
 		}
 	}
 	/* Tags edit - end */
+
+	/* Projects edit - start */
+	.projects-edit {
+		.content;
+
+		.projects-edit-list {
+			.project-item {
+				.project-color {
+					width: 20px;
+					height: 20px;
+					display: inline-block;
+					margin-right: 10px;
+					margin-top: 5px;
+				}
+				.edit-project-block {
+					display: inline-block;
+
+					.input-edit-project {
+						display: inline-block;
+						margin-left: 15px;
+					}
+
+					.select-colors-list {
+						display: inline-block;
+						vertical-align: middle;
+						margin-left: 15px;
+						margin-right: 15px;
+
+						.select-color {
+							width: 20px;
+							height: 20px;
+							display: inline-block;
+							margin-left: 2px;
+							border: 2px solid #ebebeb;
+							cursor: pointer;
+
+							&.active {
+								border: 2px solid #000;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	/* Projects edit - end */
 
 	/* Footer - start */
 

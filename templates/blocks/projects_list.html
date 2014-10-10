@@ -1,0 +1,16 @@
+<script type="text/template" id="projects-edit">
+
+<div class="projects-edit-list">
+
+	<% _.each(projects.models, function(project, key) { %>
+
+		<div class="project-item">
+			<span class="project-color sc-bg <%= colors['projects'][project.get('color')] %>"></span>
+			<a class="project-name" project-id="<%= project.get('id') %>"><%= project.get('name') %></a>
+		</div>
+
+	<% }); %>
+
+</div>
+
+</script>
