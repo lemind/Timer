@@ -77,51 +77,97 @@ $(function(){
 
 		function filterByDate (start, end) {
 			var	tasks_filtered = tasks.getTasksByDates(getFormatDate(start), getFormatDate(end)),
-				period_count_day = moment.duration(moment(end).diff(moment(start), 'days', true), "day").days() + 1;
+				period_count_day = moment(end).diff(moment(start), 'days', true) + 1;
 
-			renderChart(tasks_filtered);
+			renderChart(tasks_filtered, period_count_day);
 
 			FormTasksByTags(tasks_filtered, period_count_day);
 		}	
 
+		function tasksListByMoment (tasks_filtered, moment_size) {
+		    var tasks_by_moments = {},
+		    	moment_list = [],
+		    	current_moment;
 
-		function renderChart (tasks_filtered) {
+		    function addToMomentList (task_moment) {
+		    	if (moment_size == 'month') {
+		    		moment_list.push(moment.months(task_moment));
+		    	} else {
+		    		moment_list.push(task_moment);
+		    	}
+		    }
 
-		    var tasks_by_days = {},
-		    	day_list = [],
-		    	tasks_bar_series = [],
-		    	projects_detailed = {},
-		    	current_day,
-		    	projectsDetailedView,
-		    	period_total_time = 0;
-
-		    //forming task by days
 			tasks_filtered.forEach(function(task) {
-				var task_date = task.get('date'),
+				var task_moment,
 					current_project_name;
 
-				current_day = current_day || task_date;
-				day_list.length == 0 && day_list.push(task_date);
+				switch (moment_size) {
+					case 'day':
+						task_moment = task.get('date');
+						break;
+					case 'week':
+						task_moment = moment(task.get('date')).day("Monday").week();
+						break;
+					case 'month':
+						task_moment = moment(task.get('date')).month();
+						break;
+				}
 
-				tasks_by_days[task_date] = tasks_by_days[task_date] || {};
-				tasks_by_days[task_date].tasks_list = tasks_by_days[task_date].tasks_list || [];
+				current_moment = current_moment || task_moment;
+				moment_list.length == 0 && addToMomentList(task_moment);
+
+				tasks_by_moments[task_moment] = tasks_by_moments[task_moment] || {};
+				tasks_by_moments[task_moment].tasks_list = tasks_by_moments[task_moment].tasks_list || [];
 
 				current_project_id = task.get('project_id');
 
-				tasks_by_days[task_date].by_project = tasks_by_days[task_date].by_project || {};
+				tasks_by_moments[task_moment].by_project = tasks_by_moments[task_moment].by_project || {};
 
-				tasks_by_days[task_date].by_project[current_project_id] = tasks_by_days[task_date].by_project[current_project_id] || {};
+				tasks_by_moments[task_moment].by_project[current_project_id] = tasks_by_moments[task_moment].by_project[current_project_id] || {};
 
-				tasks_by_days[task_date].by_project[current_project_id].sum = tasks_by_days[task_date].by_project[current_project_id].sum || 0;
-				tasks_by_days[task_date].by_project[current_project_id].sum += parseInt(task.get('time'));
+				tasks_by_moments[task_moment].by_project[current_project_id].sum = tasks_by_moments[task_moment].by_project[current_project_id].sum || 0;
+				tasks_by_moments[task_moment].by_project[current_project_id].sum += parseInt(task.get('time'));
 
-				tasks_by_days[task_date].tasks_list.push(task);
+				tasks_by_moments[task_moment].tasks_list.push(task);
 
-				if (current_day != task_date) {
-					current_day = task_date;
-					day_list.push(task_date);
+				if (current_moment != task_moment) {
+					current_moment = task_moment;
+					//moment_list.push(moment.months(task_moment));
+					addToMomentList(task_moment);
 				}
 			});
+
+			return {'tasks_by_moments':tasks_by_moments, 'moment_list':moment_list};
+		}
+
+		function renderChart (tasks_filtered, period_count_day) {
+
+		    var moment_list = [],
+		    	tasks_bar_series = [],
+		    	tickInterval,
+		    	projects_detailed = {},
+		    	projectsDetailedView,
+		    	period_total_time = 0,
+		    	tasksList,
+		    	tasks_by_moments;
+
+			switch (true) {
+				case period_count_day <= 31:
+					tasksList = tasksListByMoment(tasks_filtered, 'day');
+					tickInterval = 3600000; //1 hour
+					break;
+				case period_count_day > 31 && period_count_day <= 90:
+					tasksList = tasksListByMoment(tasks_filtered, 'week');
+					tickInterval = 3600000*12; //8 hours
+					break;
+				case period_count_day > 90:
+					tasksList = tasksListByMoment(tasks_filtered, 'month');
+					tickInterval = 3600000*48; //8 hours
+					break;
+			}
+
+			tasks_by_moments = tasksList.tasks_by_moments;
+			moment_list = tasksList.moment_list;
 
 			//forming projects_detailed
 			projects.forEach(function(project) {
@@ -134,8 +180,7 @@ $(function(){
 				projects_detailed[item.id] = projects_detailed[item.id] || {};
 				projects_detailed[item.id].tasks_list = projects_detailed[item.id].tasks_list || {};
 
-				$.each(tasks_by_days, function(index, value) {
-
+				$.each(tasks_by_moments, function(index, value) {
 					value.tasks_list.forEach(function(task) {
 						if (task.get('project_id') == project.get('id')) {
 							projects_detailed[item.id].tasks_list[task.get('desc')] = projects_detailed[item.id].tasks_list[task.get('desc')] || {};
@@ -214,7 +259,7 @@ $(function(){
 	                text:''
 	            },
 	            xAxis: {
-	                categories: day_list
+	                categories: moment_list
 	            },
 	            yAxis: {
 	                min: 0,
@@ -237,7 +282,7 @@ $(function(){
 						    return time == '00' ? '' : time.substring(0, time.length - 6) + 'h';
 						}
 		            },
-		            tickInterval: 3600000 //1 hour
+		            tickInterval: tickInterval
 	            },
 	            legend: {
 	                align: 'top',
