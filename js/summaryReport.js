@@ -387,16 +387,18 @@ $(function(){
 			var sum_time_tags = [];
 		    //forming time task by tags
 			tasks_filtered.forEach(function(task) {
-				task.get('tags_ids_arr').forEach(function(tag_id) {
-					if (!sum_time_tags[tag_id]) {
-						sum_time_tags[tag_id] = {};
-						sum_time_tags[tag_id].time = parseInt(task.get('time'));
-						sum_time_tags[tag_id].time_average = parseInt(task.get('time')) / period_count_day;
-					} else {
-						sum_time_tags[tag_id].time += parseInt(task.get('time'));
-						sum_time_tags[tag_id].time_average += parseInt(task.get('time')) / period_count_day;
-					}
-				});
+
+				if (task.get('tags_ids_arr'))
+					task.get('tags_ids_arr').forEach(function(tag_id) {
+						if (!sum_time_tags[tag_id]) {
+							sum_time_tags[tag_id] = {};
+							sum_time_tags[tag_id].time = parseInt(task.get('time'));
+							sum_time_tags[tag_id].time_average = parseInt(task.get('time')) / period_count_day;
+						} else {
+							sum_time_tags[tag_id].time += parseInt(task.get('time'));
+							sum_time_tags[tag_id].time_average += parseInt(task.get('time')) / period_count_day;
+						}
+					});
 				
 			});
 
