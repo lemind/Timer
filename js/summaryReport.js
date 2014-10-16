@@ -111,6 +111,9 @@ $(function(){
 					case 'month':
 						task_moment = moment(task.get('date')).month();
 						break;
+					case 'year':
+						task_moment = moment(task.get('date')).year();
+						break;
 				}
 
 				current_moment = current_moment || task_moment;
@@ -158,11 +161,15 @@ $(function(){
 					break;
 				case period_count_day > 31 && period_count_day <= 90:
 					tasksList = tasksListByMoment(tasks_filtered, 'week');
-					tickInterval = 3600000*12; //8 hours
+					tickInterval = 3600000*12; 
 					break;
-				case period_count_day > 90:
+				case period_count_day > 90 && period_count_day <= 730:
 					tasksList = tasksListByMoment(tasks_filtered, 'month');
-					tickInterval = 3600000*48; //8 hours
+					tickInterval = 3600000*48; 
+					break;
+				case period_count_day > 730:
+					tasksList = tasksListByMoment(tasks_filtered, 'year');
+					tickInterval = 3600000*480; 
 					break;
 			}
 
