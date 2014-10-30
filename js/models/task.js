@@ -51,6 +51,19 @@ window.Tasks = Backbone.Collection.extend({
 		return gf;
 	},
 
+	getTasksByParams: function(descs, date_start, date_end) {
+		var gf = this.models.filter(function(model) {
+
+			return (
+				descs.indexOf(model.get('desc')) != -1 &&
+				moment(model.get('date'), 'YYYY-MM-DD') >= moment(date_start, 'YYYY-MM-DD') &&
+				moment(model.get('date'), 'YYYY-MM-DD') <= moment(date_end, 'YYYY-MM-DD')
+			)
+		});
+
+		return gf;
+	},
+
 	fetch: function(options) {
 		options || (options = {});
 		this.data = (options.data || {});

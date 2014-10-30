@@ -1,0 +1,27 @@
+{% include 'header.html' %}
+
+<div class="task-report">
+	
+	<div class="filters">
+		<div class="row">
+			<input type="task" class="task search-task" placeholder="Add task by desc">
+		</div>
+		<div class="row">
+			<div class="filters-period" id="filters">
+				<div class="period">
+					<input id="from" name="from">
+					<input id="to" name="to">
+				</div>
+				<button type="button" class="filter btn btn-primary">Filter</button>
+			</div>
+		</div>
+		<div class="row">
+			<div class="filter-task-list clearfix"></div>
+		</div>
+	</div>
+
+	<div id="task-report-line" style="max-width: 100%; height: 300px; margin: 0 auto"></div>
+
+</div>
+
+{% include 'footer.html' %}

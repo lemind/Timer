@@ -55,6 +55,22 @@ $app->get(
     }
 );
 
+$app->get(
+    '/taskreport',
+    function () use ($app) {
+
+        $app->render(
+            'task_report.html',
+            array(
+                'tags' => getTags(),
+                'projects' => getProjects(),
+                'tasks' => getTasks(),
+                'page' => 'taskreport'
+            )
+        );
+    }
+);
+
 // get tasks
 $app->get(
     '/tasks(/:begin/:end)',
@@ -76,7 +92,11 @@ $app->post(
         {
             $db = getConnection();
 
-            $sql = "select * from tasks where `desc` like '%" . $data->term . "%' GROUP BY `desc`,`tags`";
+            if ($data->tags) {
+                $sql = "select * from tasks where `desc` like '%" . $data->term . "%' GROUP BY `desc`,`tags`";
+            } else {
+                $sql = "select * from tasks where `desc` like '%" . $data->term . "%' GROUP BY `desc`";
+            }
 
             $stmt = $db->prepare($sql);
             $stmt->execute();

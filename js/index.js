@@ -384,7 +384,7 @@ $(function(){
 						type: "POST",
 						quietMillis: 50,
 						data: function ( term ) { 
-							return JSON.stringify({term: term}); 
+							return JSON.stringify({term: term, tags: true}); 
 						},
 						results: function (data) {
 							return { 

@@ -257,7 +257,6 @@ $(function(){
 					}
 				});
 
-
 	        $("#summary-report-bar").highcharts({
 	            chart: {
 	                type: 'column'
