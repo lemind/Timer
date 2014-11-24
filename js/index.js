@@ -468,7 +468,6 @@ $(function(){
 					taskStart(current_task_id);
 
 				}, 1000);
-
 			},		
 			deleteTask: function (ev) {
 
