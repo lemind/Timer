@@ -455,6 +455,8 @@ $(function(){
 			oldTaskStart: function (ev) {
 				var el_task_line
 
+				timer_status && this.stop();
+
 				el_task_line = $(ev.target).parents('.task');
 
 				current_task_id = el_task_line.attr("id");
