@@ -393,10 +393,22 @@ $app->post(
 $app->run();
 
 function getConnection() {
-    $dbhost="127.0.0.1";
-    $dbuser="root";
-    $dbpass="root";
-    $dbname="timer";
+    $config = file_get_contents("config.json");
+    $configArr = new stdClass;
+
+    $jsonIterator = new RecursiveIteratorIterator(
+        new RecursiveArrayIterator(json_decode($config, TRUE)),
+        RecursiveIteratorIterator::SELF_FIRST);
+
+    foreach ($jsonIterator as $key => $val) {
+        //todo fix for array is_array
+        $configArr->$key = $val;
+    }
+
+    $dbhost=$configArr->dbhost;
+    $dbuser=$configArr->dbuser;
+    $dbpass=$configArr->dbpass;
+    $dbname=$configArr->dbname;
 
     $dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpass);  
     $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
