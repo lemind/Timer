@@ -413,7 +413,7 @@ $app->post(
 $app->run();
 
 function getConnection() {
-    $config = file_get_contents("config.json");
+    $config = file_get_contents("../config.json");
     $configArr = new stdClass;
 print_r($config);
 die;
