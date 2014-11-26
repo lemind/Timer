@@ -415,7 +415,8 @@ $app->run();
 function getConnection() {
     $config = file_get_contents("config.json");
     $configArr = new stdClass;
-
+print_r($config);
+die;
     $jsonIterator = new RecursiveIteratorIterator(
         new RecursiveArrayIterator(json_decode($config, TRUE)),
         RecursiveIteratorIterator::SELF_FIRST);
@@ -424,7 +425,8 @@ function getConnection() {
         //todo fix for array is_array
         $configArr->$key = $val;
     }
-
+print_r($configArr);
+die;
     $dbhost=$configArr->dbhost;
     $dbuser=$configArr->dbuser;
     $dbpass=$configArr->dbpass;
