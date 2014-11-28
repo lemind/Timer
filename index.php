@@ -11,12 +11,51 @@ $app->get(
     '/',
     function () use ($app) {
 
+        session_start();
+        $authUrl = '';
+        $user = '';
+
+        if (!isset($_SESSION['user'])) {
+
+            //get config
+            $config = file_get_contents("../config.json");
+            $configArr = new stdClass;
+
+            $jsonIterator = new RecursiveIteratorIterator(
+                new RecursiveArrayIterator(json_decode($config, TRUE)),
+                RecursiveIteratorIterator::SELF_FIRST);
+
+            foreach ($jsonIterator as $key => $val) {
+                //todo fix for array is_array
+                $configArr->$key = $val;
+            }
+
+            $client = new Google_Client();
+            $client->setClientId($configArr->client_id);
+            $client->setClientSecret($configArr->client_secret);
+            $client->setRedirectUri($configArr->redirect_uri);
+
+            $client->setScopes(array('email', 'https://www.googleapis.com/auth/userinfo.profile'));
+            $authUrl = $client->createAuthUrl();
+            $authFl = 0;
+
+        } else {
+            $user = $_SESSION['user'];
+            $authFl = 1;
+        }
+
+        $userArr = json_decode($user);
+
         $app->render(
             'index.html',
             array(
                 'tags' => getTags(),
                 'projects' => getProjects(),
                 'tasks' => getTasks(),
+                'authUrl' => $authUrl,
+                'user' => $user,
+                'userEmail' => $userArr->email,
+                'authFl' => $authFl,
                 'page' => 'home'
             )
         );

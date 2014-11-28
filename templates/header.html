@@ -76,4 +76,10 @@
 			<li class="{{ (page == 'taskreport') ? 'active'}}"><a href="taskreport">Task report</a></li>
 		</ul>
 
+		<span class="pull-right {{ (authFl == 1) ? 'hide'}}"><a href="{{ authUrl }}">Login</a></span>
+		<span class="pull-right {{ (authFl == 0) ? 'hide'}}">
+			<span>{{ userEmail }}</span>
+			<span><a href="logout.php">Logout</a></span>
+		</span>
+
 	</div>
