@@ -437,7 +437,21 @@ $(function(){
 
 			},		
 			start: function () {
-				!main_select2_projects.select2('data') && main_select2_projects.select2('data', {id: 1, name: 'no project'});
+				//create 'no project'
+				if (!main_select2_projects.select2('data')) {
+					projects.each(function(project) {
+						if (project.get('name') == 'no project') {
+							main_select2_projects.select2('data', {id: project.get('id'), name: 'no project'});
+						}
+					});
+
+					if (!main_select2_projects.select2('data')) {
+						createProject('no project');
+						setTimeout(function() {
+							main_select2_projects.select2('data', {id: last_new_project.get('id'), name: 'no project'});
+						}, 100);
+					}
+				}
 
 				main_button_start
 					.text('Stop')
