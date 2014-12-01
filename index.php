@@ -37,6 +37,7 @@ $app->get(
 
             $client->setScopes(array('email', 'https://www.googleapis.com/auth/userinfo.profile'));
             $authUrl = $client->createAuthUrl();
+            $user = '{"id":0, "email":"demo"}';
             $authFl = 0;
 
         } else {
@@ -125,6 +126,8 @@ $app->post(
     '/descstasks',
     function () use ($app) {
 
+        $userArr = getSessionUser();
+
         $data = json_decode($app->request()->getBody());
 
         try
@@ -132,9 +135,9 @@ $app->post(
             $db = getConnection();
 
             if ($data->tags) {
-                $sql = "select * from tasks where `desc` like '%" . $data->term . "%' GROUP BY `desc`,`tags`";
+                $sql = "select * from tasks where `desc` like '%" . $data->term . "%' AND user_id=" .$userArr->id. " GROUP BY `desc`,`tags`";
             } else {
-                $sql = "select * from tasks where `desc` like '%" . $data->term . "%' GROUP BY `desc`";
+                $sql = "select * from tasks where `desc` like '%" . $data->term . "%' AND user_id=" .$userArr->id. " GROUP BY `desc`";
             }
 
             $stmt = $db->prepare($sql);
@@ -159,6 +162,8 @@ $app->post(
     '/task',
     function () use ($app) {
 
+        $userArr = getSessionUser();
+
         $data = json_decode($app->request()->getBody());
 
         $begin_time_json = json_encode(array(array('b' => $data->begin_period)));
@@ -167,7 +172,7 @@ $app->post(
         {
             $db = getConnection();
 
-            $sql = "insert into tasks (`status`, `desc`, `project_id`, `date`, `tags`, `periods`) values(?, ?, ?, ?, ?, ?)";
+            $sql = "insert into tasks (`status`, `desc`, `project_id`, `date`, `tags`, `periods`, `user_id`) values(?, ?, ?, ?, ?, ?, ?)";
 
             $stmt = $db->prepare($sql);
             $stmt->execute(array(
@@ -178,6 +183,7 @@ $app->post(
                 $data->date,
                 $data->tags,
                 $begin_time_json,
+                $userArr->id
             ));
             $data->id = $db->lastInsertId();
 
@@ -300,17 +306,20 @@ $app->post(
     '/project',
     function () use ($app) {
 
+        $userArr = getSessionUser();
+
         $data = json_decode($app->request()->getBody());
 
         try
         {
             $db = getConnection();
 
-            $sql = "insert into projects (`name`, `color`) values(?, ?)";
+            $sql = "insert into projects (`name`, `color`, `user_id`) values(?, ?, ?)";
             $stmt = $db->prepare($sql);
             $stmt->execute(array(
                 $data->name,
-                $data->color
+                $data->color,
+                $userArr->id
             ));
             $data->id = $db->lastInsertId();
 
@@ -420,17 +429,20 @@ $app->post(
     '/tag',
     function () use ($app) {
 
+        $userArr = getSessionUser();
+
         $data = json_decode($app->request()->getBody());
 
         try
         {
             $db = getConnection();
 
-            $sql = "insert into tags (`name`, `color`) values(?, ?)";
+            $sql = "insert into tags (`name`, `color`, `user_id`) values(?, ?, ?)";
             $stmt = $db->prepare($sql);
             $stmt->execute(array(
                 $data->name,
-                $data->color
+                $data->color,
+                $userArr->id
             ));
             $data->id = $db->lastInsertId();
 
@@ -474,19 +486,21 @@ function getConnection() {
     return $dbh;
 }
 
-function getTags() {
+function getTags($user_id) {
+
+    $userArr = getSessionUser();
 
     try
     {
         $db = getConnection();
 
-        $sql = "select * from tags";
+        $sql = "select * from tags where user_id=".$userArr->id;
         $stmt = $db->prepare($sql);
         $stmt->execute();
 
         $tags = $stmt->fetchAll(PDO::FETCH_OBJ);
 
-        $db = null;            
+        $db = null;
 
         $result = json_encode($tags);
     } catch(PDOException $e) {
@@ -497,19 +511,21 @@ function getTags() {
 
 }
 
-function getProjects() {
+function getProjects($user_id) {
+
+    $userArr = getSessionUser();
 
     try
     {
         $db = getConnection();
 
-        $sql = "select * from projects";
+        $sql = "select * from projects where user_id=".$userArr->id;
         $stmt = $db->prepare($sql);
         $stmt->execute();
 
         $projects = $stmt->fetchAll(PDO::FETCH_OBJ);
 
-        $db = null;            
+        $db = null;
 
         $result = json_encode($projects);
     } catch(PDOException $e) {
@@ -522,13 +538,16 @@ function getProjects() {
 
 function getTasks($begin_period = NULL, $end_period = NULL) {
 
+    $userArr = getSessionUser();
+
     try
     {
         $db = getConnection();
 
         if (!$begin_period && !$end_period) {
 
-            $sql = "select * from tasks order by id desc limit 1";
+            $sql = "select * from tasks where user_id='".$userArr->id."' order by id desc limit 1";
+
             $stmt = $db->prepare($sql);
             $stmt->execute();
 
@@ -536,10 +555,10 @@ function getTasks($begin_period = NULL, $end_period = NULL) {
 
             $begin_period = date('Y-m-d', strtotime($last_tasks[0]->date . " -7 days"));
 
-            $sql = "select * from tasks where `date` >= '" . $begin_period . "'";
+            $sql = "select * from tasks where user_id='".$userArr->id."' AND `date` >= '" . $begin_period . "'";
 
         } else {
-            $sql = "select * from tasks where `date` >= '" . $begin_period . "' AND `date` < '" . $end_period . "'";
+            $sql = "select * from tasks where user_id='".$userArr->id."' AND `date` >= '" . $begin_period . "' AND `date` < '" . $end_period . "'";
         }
 
         $stmt = $db->prepare($sql);
@@ -547,7 +566,7 @@ function getTasks($begin_period = NULL, $end_period = NULL) {
         $tasks = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         if (count($tasks) == 0) {
-            $sql = "select * from tasks where `date` < '" . $begin_period . "' order by id desc limit 20";
+            $sql = "select * from tasks where user_id='".$userArr->id."' AND `date` < '" . $begin_period . "' order by id desc limit 20";
             $stmt = $db->prepare($sql);
             $stmt->execute();
 
@@ -563,4 +582,16 @@ function getTasks($begin_period = NULL, $end_period = NULL) {
 
     return $result;
 
+}
+
+function getSessionUser() {
+
+    session_start();
+    if (isset($_SESSION['user'])) {
+        return json_decode($_SESSION['user']);
+    } else {
+        $demoUser = new stdClass;
+        $demoUser->id = 0;
+        return $demoUser;
+    }
 }
