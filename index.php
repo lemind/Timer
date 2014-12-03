@@ -484,7 +484,11 @@ $app->post(
 $app->run();
 
 function getConnection() {
-    $config = file_get_contents("../config.json");
+    if (file_exists("../config.json")) {
+        $config = file_get_contents("../config.json");
+    } else {
+        $config = "{}";
+    }
     $configArr = new stdClass;
 
     $jsonIterator = new RecursiveIteratorIterator(
@@ -496,12 +500,34 @@ function getConnection() {
         $configArr->$key = $val;
     }
 
+    if (!isset($configArr->dbhost)) {
+        $configArr->dbhost = getenv('TIMER_DBHOST');
+        if ($configArr->dbhost === FALSE) {
+            $configArr->dbhost = getenv('OPENSHIFT_MYSQL_DB_HOST');
+        }
+    }
+    if (!isset($configArr->dbuser)) {
+        $configArr->dbuser = getenv('TIMER_DBUSER');
+        if ($configArr->dbuser === FALSE) {
+            $configArr->dbuser = getenv('OPENSHIFT_MYSQL_DB_USERNAME');
+        }
+    }
+    if (!isset($configArr->dbpass)) {
+        $configArr->dbpass = getenv('TIMER_DBPASS');
+        if ($configArr->dbpass === FALSE) {
+            $configArr->dbpass = getenv('OPENSHIFT_MYSQL_DB_PASSWORD');
+        }
+    }
+    if (!isset($configArr->dbname)) {
+        $configArr->dbname = getenv('TIMER_DBNAME');
+    }
+
     $dbhost=$configArr->dbhost;
     $dbuser=$configArr->dbuser;
     $dbpass=$configArr->dbpass;
     $dbname=$configArr->dbname;
 
-    $dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpass);  
+    $dbh = new PDO("mysql:host=$dbhost;dbname=$dbname;charset=utf8", $dbuser, $dbpass);
     $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     return $dbh;
 }
@@ -630,7 +656,11 @@ function auth() {
     if (!isset($_SESSION['user'])) {
 
         //get config
-        $config = file_get_contents("../config.json");
+        if (file_exists("../config.json")) {
+            $config = file_get_contents("../config.json");
+        } else {
+            $config = "{}";
+        }
         $configArr = new stdClass;
 
         $jsonIterator = new RecursiveIteratorIterator(
@@ -640,6 +670,16 @@ function auth() {
         foreach ($jsonIterator as $key => $val) {
             //todo fix for array is_array
             $configArr->$key = $val;
+        }
+
+        if (!isset($configArr->client_id)) {
+            $configArr->client_id = getenv('TIMER_CLIENT_ID');
+        }
+        if (!isset($configArr->client_secret)) {
+            $configArr->client_secret = getenv('TIMER_CLIENT_SECRET');
+        }
+        if (!isset($configArr->redirect_uri)) {
+            $configArr->redirect_uri = getenv('TIMER_REDIRECT_URI');
         }
 
         $client = new Google_Client();
