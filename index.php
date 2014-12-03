@@ -510,7 +510,7 @@ function getConnection() {
     return $dbh;
 }
 
-function getTags($user_id) {
+function getTags() {
 
     $userArr = getSessionUser();
 
@@ -535,7 +535,7 @@ function getTags($user_id) {
 
 }
 
-function getProjects($user_id) {
+function getProjects() {
 
     $userArr = getSessionUser();
 
@@ -610,7 +610,9 @@ function getTasks($begin_period = NULL, $end_period = NULL) {
 
 function getSessionUser() {
 
-    session_start();
+    if(!isset($_SESSION)){
+        session_start();
+    }
     if (isset($_SESSION['user'])) {
         return json_decode($_SESSION['user']);
     } else {
