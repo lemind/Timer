@@ -14,41 +14,7 @@ $app->get(
     '/',
     function () use ($app) {
 
-        session_start();
-        $authUrl = '';
-        $user = '';
-
-        if (!isset($_SESSION['user'])) {
-
-            //get config
-            $config = file_get_contents("../config.json");
-            $configArr = new stdClass;
-
-            $jsonIterator = new RecursiveIteratorIterator(
-                new RecursiveArrayIterator(json_decode($config, TRUE)),
-                RecursiveIteratorIterator::SELF_FIRST);
-
-            foreach ($jsonIterator as $key => $val) {
-                //todo fix for array is_array
-                $configArr->$key = $val;
-            }
-
-            $client = new Google_Client();
-            $client->setClientId($configArr->client_id);
-            $client->setClientSecret($configArr->client_secret);
-            $client->setRedirectUri($configArr->redirect_uri);
-
-            $client->setScopes(array('email', 'https://www.googleapis.com/auth/userinfo.profile'));
-            $authUrl = $client->createAuthUrl();
-            $user = '{"id":0, "email":"demo"}';
-            $authFl = 0;
-
-        } else {
-            $user = $_SESSION['user'];
-            $authFl = 1;
-        }
-
-        $userArr = json_decode($user);
+        $auth = auth();
 
         $app->render(
             'index.html',
@@ -56,10 +22,10 @@ $app->get(
                 'tags' => getTags(),
                 'projects' => getProjects(),
                 'tasks' => getTasks(),
-                'authUrl' => $authUrl,
-                'user' => $user,
-                'userEmail' => $userArr->email,
-                'authFl' => $authFl,
+                'authUrl' => $auth->authUrl,
+                'user' => $auth->user,
+                'userEmail' => $auth->userEmail,
+                'authFl' => $auth->authFl,
                 'page' => 'home'
             )
         );
@@ -70,12 +36,18 @@ $app->get(
     '/summary',
     function () use ($app) {
 
+        $auth = auth();
+
         $app->render(
             'summary_report.html',
             array(
                 'tags' => getTags(),
                 'projects' => getProjects(),
                 'tasks' => getTasks(),
+                'authUrl' => $auth->authUrl,
+                'user' => $auth->user,
+                'userEmail' => $auth->userEmail,
+                'authFl' => $auth->authFl,
                 'page' => 'summary'
             )            
         );
@@ -86,12 +58,18 @@ $app->get(
     '/weekly',
     function () use ($app) {
 
+        $auth = auth();
+
         $app->render(
             'weekly_report.html',
             array(
                 'tags' => getTags(),
                 'projects' => getProjects(),
                 'tasks' => getTasks(),
+                'authUrl' => $auth->authUrl,
+                'user' => $auth->user,
+                'userEmail' => $auth->userEmail,
+                'authFl' => $auth->authFl,
                 'page' => 'weekly'
             )
         );
@@ -102,12 +80,18 @@ $app->get(
     '/taskreport',
     function () use ($app) {
 
+        $auth = auth();
+
         $app->render(
             'task_report.html',
             array(
                 'tags' => getTags(),
                 'projects' => getProjects(),
                 'tasks' => getTasks(),
+                'authUrl' => $auth->authUrl,
+                'user' => $auth->user,
+                'userEmail' => $auth->userEmail,
+                'authFl' => $auth->authFl,
                 'page' => 'taskreport'
             )
         );
@@ -380,11 +364,17 @@ $app->get(
     '/projectsedit',
     function () use ($app) {
 
+        $auth = auth();
+
         $app->render(
             'projects_edit.html',
             array(
                 'tags' => getTags(),
                 'projects' => getProjects(),
+                'authUrl' => $auth->authUrl,
+                'user' => $auth->user,
+                'userEmail' => $auth->userEmail,
+                'authFl' => $auth->authFl,
             )
         );
 
@@ -434,11 +424,17 @@ $app->get(
     '/tagsedit',
     function () use ($app) {
 
+        $auth = auth();
+
         $app->render(
             'tags_edit.html',
             array(
                 'tags' => getTags(),
                 'projects' => getProjects(),
+                'authUrl' => $auth->authUrl,
+                'user' => $auth->user,
+                'userEmail' => $auth->userEmail,
+                'authFl' => $auth->authFl,
             )
         );
 
@@ -620,4 +616,54 @@ function getSessionUser() {
         $demoUser->id = 0;
         return $demoUser;
     }
+}
+
+function auth() {
+
+    if(!isset($_SESSION)){
+        session_start();
+    }
+
+    $authUrl = '';
+    $user = '';
+
+    if (!isset($_SESSION['user'])) {
+
+        //get config
+        $config = file_get_contents("../config.json");
+        $configArr = new stdClass;
+
+        $jsonIterator = new RecursiveIteratorIterator(
+            new RecursiveArrayIterator(json_decode($config, TRUE)),
+            RecursiveIteratorIterator::SELF_FIRST);
+
+        foreach ($jsonIterator as $key => $val) {
+            //todo fix for array is_array
+            $configArr->$key = $val;
+        }
+
+        $client = new Google_Client();
+        $client->setClientId($configArr->client_id);
+        $client->setClientSecret($configArr->client_secret);
+        $client->setRedirectUri($configArr->redirect_uri);
+
+        $client->setScopes(array('email', 'https://www.googleapis.com/auth/userinfo.profile'));
+        $authUrl = $client->createAuthUrl();
+        $user = '{"id":0, "email":"demo"}';
+        $authFl = 0;
+
+    } else {
+        $user = $_SESSION['user'];
+        $authFl = 1;
+    }
+
+    $userArr = json_decode($user);
+
+    $result = new stdClass;
+    $result->authUrl = $authUrl;
+    $result->user = $user;
+    $result->userEmail = $userArr->email;
+    $result->authFl = $authFl;
+
+    return $result;
 }
