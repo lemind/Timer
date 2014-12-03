@@ -132,13 +132,16 @@ $app->post(
             $db = getConnection();
 
             if ($data->tags) {
-                $sql = "select * from tasks where `desc` like '%" . $data->term . "%' AND user_id=" .$userArr->id. " GROUP BY `desc`,`tags`";
+                $sql = "select * from tasks where `desc` like :term AND user_id = :id GROUP BY `desc`,`tags`";
             } else {
-                $sql = "select * from tasks where `desc` like '%" . $data->term . "%' AND user_id=" .$userArr->id. " GROUP BY `desc`";
+                $sql = "select * from tasks where `desc` like :term AND user_id = :id GROUP BY `desc`";
             }
 
             $stmt = $db->prepare($sql);
-            $stmt->execute();
+            $stmt->execute(array(
+                ':term' => '%'.$data->term.'%',
+                ':id' => $userArr->id,
+            ));
 
             $tasks = $stmt->fetchAll(PDO::FETCH_OBJ);
 
