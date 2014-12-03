@@ -480,7 +480,7 @@ $(function(){
 					console.log('2');
 
 					taskStart(current_task_id);
-				}, 1000);
+				}, 2000);
 
 			},		
 			deleteTask: function (ev) {
