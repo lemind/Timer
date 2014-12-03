@@ -210,10 +210,12 @@ $app->put(
 
             if ($data->status == 1) {
                 if ($data->new_task == 1) {
-                    $sql = "select periods from tasks where id=".$id;
+                    $sql = "select periods from tasks where id = :id";
 
                     $stmt = $db->prepare($sql);
-                    $stmt->execute();
+                    $stmt->execute(array(
+                        ':id' => $id,
+                    ));
 
                     $periods = $stmt->fetchColumn();
 
@@ -228,10 +230,12 @@ $app->put(
             } else {
                 if (isset($data->end_period)) {
                     if ($data->end_period) {
-                        $sql = "select periods from tasks where id=".$id;
+                        $sql = "select periods from tasks where id = :id";
 
                         $stmt = $db->prepare($sql);
-                        $stmt->execute();
+                        $stmt->execute(array(
+                            ':id' => $id,
+                        ));
 
                         $periods = $stmt->fetchColumn();
 
@@ -245,9 +249,9 @@ $app->put(
             }
 
             if ($without_periods) {
-                $sql = "update tasks set `time` = :time, `time_str` = :time_str, `desc` = :desc, `project_id` = :project_id, `tags` = :tags, `status` = :status where id=".$id;
+                $sql = "update tasks set `time` = :time, `time_str` = :time_str, `desc` = :desc, `project_id` = :project_id, `tags` = :tags, `status` = :status where id = :id";
             } else {
-                $sql = "update tasks set `time` = :time, `time_str` = :time_str, `desc` = :desc, `project_id` = :project_id, `tags` = :tags, `periods` = :periods, `status` = :status where id=".$id;                
+                $sql = "update tasks set `time` = :time, `time_str` = :time_str, `desc` = :desc, `project_id` = :project_id, `tags` = :tags, `periods` = :periods, `status` = :status where id = :id";
             }
 
             $stmt = $db->prepare($sql);
@@ -260,7 +264,9 @@ $app->put(
                 $stmt->bindParam(":periods", $periods);
             }
             $stmt->bindParam(":status", $data->status);
-            $stmt->execute();
+            $stmt->execute(array(
+                ':id' => $id,
+            ));
 
             echo '{"status_update": "ok"}';
         } catch(PDOException $e) {
@@ -280,9 +286,11 @@ $app->delete(
         {
             $db = getConnection();
 
-            $sql = "delete from tasks where id=".$id;
+            $sql = "delete from tasks where id = :id";
             $stmt = $db->prepare($sql);
-            $stmt->execute();
+            $stmt->execute(array(
+                ':id' => $id,
+            ));
 
             echo '{"status": "ok"}';
         } catch(PDOException $e) {
@@ -347,12 +355,14 @@ $app->put(
         {
             $db = getConnection();
 
-            $sql = "update projects set `name` = :name, `color` = :color where id=".$id;
+            $sql = "update projects set `name` = :name, `color` = :color where id = :id";
 
             $stmt = $db->prepare($sql);
             $stmt->bindParam(":name", $data->name);
             $stmt->bindParam(":color", $data->color);
-            $stmt->execute();
+            $stmt->execute(array(
+                ':id' => $id,
+            ));
 
             echo '{"status_update": "ok"}';
         } catch(PDOException $e) {
@@ -407,12 +417,14 @@ $app->put(
         {
             $db = getConnection();
 
-            $sql = "update tags set `name` = :name, `color` = :color where id=".$id;
+            $sql = "update tags set `name` = :name, `color` = :color where id = :id";
 
             $stmt = $db->prepare($sql);
             $stmt->bindParam(":name", $data->name);
             $stmt->bindParam(":color", $data->color);
-            $stmt->execute();
+            $stmt->execute(array(
+                ':id' => $id,
+            ));
 
             echo '{"status_update": "ok"}';
         } catch(PDOException $e) {
@@ -543,9 +555,11 @@ function getTags() {
     {
         $db = getConnection();
 
-        $sql = "select * from tags where user_id=".$userArr->id;
+        $sql = "select * from tags where user_id = :user_id";
         $stmt = $db->prepare($sql);
-        $stmt->execute();
+        $stmt->execute(array(
+            ':user_id' => $userArr->id,
+        ));
 
         $tags = $stmt->fetchAll(PDO::FETCH_OBJ);
 
@@ -568,9 +582,11 @@ function getProjects() {
     {
         $db = getConnection();
 
-        $sql = "select * from projects where user_id=".$userArr->id;
+        $sql = "select * from projects where user_id = :user_id";
         $stmt = $db->prepare($sql);
-        $stmt->execute();
+        $stmt->execute(array(
+            ':user_id' => $userArr->id,
+        ));
 
         $projects = $stmt->fetchAll(PDO::FETCH_OBJ);
 
@@ -595,29 +611,42 @@ function getTasks($begin_period = NULL, $end_period = NULL) {
 
         if (!$begin_period && !$end_period) {
 
-            $sql = "select * from tasks where user_id='".$userArr->id."' order by id desc limit 1";
+            $sql = "select * from tasks where user_id = :user_id order by id desc limit 1";
 
             $stmt = $db->prepare($sql);
-            $stmt->execute();
+            $stmt->execute(array(
+                ':user_id' => $userArr->id,
+            ));
 
             $last_tasks = $stmt->fetchAll(PDO::FETCH_OBJ);
 
             $begin_period = date('Y-m-d', strtotime($last_tasks[0]->date . " -7 days"));
 
-            $sql = "select * from tasks where user_id='".$userArr->id."' AND `date` >= '" . $begin_period . "'";
-
+            $sql = "select * from tasks where user_id = :user_id AND `date` >= :begin_period";
+            $sql_params = array(
+                ':user_id' => $userArr->id,
+                ':begin_period' => $begin_period,
+            );
         } else {
-            $sql = "select * from tasks where user_id='".$userArr->id."' AND `date` >= '" . $begin_period . "' AND `date` < '" . $end_period . "'";
+            $sql = "select * from tasks where user_id = :user_id AND `date` >= :begin_period AND `date` < :end_period";
+            $sql_params = array(
+                ':user_id' => $userArr->id,
+                ':begin_period' => $begin_period,
+                ':end_period' => $end_period,
+            );
         }
 
         $stmt = $db->prepare($sql);
-        $stmt->execute();
+        $stmt->execute($sql_params);
         $tasks = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         if (count($tasks) == 0) {
-            $sql = "select * from tasks where user_id='".$userArr->id."' AND `date` < '" . $begin_period . "' order by id desc limit 20";
+            $sql = "select * from tasks where user_id = :user_id AND `date` < :begin_period order by id desc limit 20";
             $stmt = $db->prepare($sql);
-            $stmt->execute();
+            $stmt->execute(array(
+                ':user_id' => $userArr->id,
+                ':begin_period' => $begin_period,
+            ));
 
             $tasks = $stmt->fetchAll(PDO::FETCH_OBJ);
         }
