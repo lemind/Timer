@@ -114,10 +114,19 @@ $app->get(
     }
 );
 
+$check_xhr = function () use ($app) {
+    if (!$app->request->isXhr()) {
+        header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
+        header('Content-Type: text/plain;charset=utf-8');
+        die('error: only XHR allowed');
+    }
+};
+
 // get tasks
 $app->get(
     '/tasks(/:begin/:end)',
-    function ($begin = NULL, $end = NULL) use ($app) {
+    function ($begin = NULL, $end = NULL) use ($app, $check_xhr) {
+        $check_xhr();
 
         echo getTasks($begin, $end);
 
@@ -127,7 +136,8 @@ $app->get(
 // get tasks descs
 $app->post(
     '/descstasks',
-    function () use ($app) {
+    function () use ($app, $check_xhr) {
+        $check_xhr();
 
         $userArr = getSessionUser();
 
@@ -163,7 +173,8 @@ $app->post(
 // create task
 $app->post(
     '/task',
-    function () use ($app) {
+    function () use ($app, $check_xhr) {
+        $check_xhr();
 
         $userArr = getSessionUser();
 
@@ -200,7 +211,8 @@ $app->post(
 // update
 $app->put(
     '/task/:id',
-    function ($id) use ($app) {
+    function ($id) use ($app, $check_xhr) {
+        $check_xhr();
 
         $without_periods = 0;
         $data = json_decode($app->request()->getBody());
@@ -274,7 +286,8 @@ $app->put(
 // delete task
 $app->delete(
     '/task/:id',
-    function ($id) use ($app) {
+    function ($id) use ($app, $check_xhr) {
+        $check_xhr();
 
         try
         {
@@ -296,7 +309,8 @@ $app->delete(
 // get projects
 $app->get(
     '/projects',
-    function () use ($app) {
+    function () use ($app, $check_xhr) {
+        $check_xhr();
 
         echo getProjects();
 
@@ -307,7 +321,8 @@ $app->get(
 // create project 
 $app->post(
     '/project',
-    function () use ($app) {
+    function () use ($app, $check_xhr) {
+        $check_xhr();
 
         $userArr = getSessionUser();
 
@@ -336,7 +351,8 @@ $app->post(
 // update project
 $app->put(
     '/project/:id',
-    function ($id) use ($app) {
+    function ($id) use ($app, $check_xhr) {
+        $check_xhr();
 
         $data = json_decode($app->request()->getBody());
 
@@ -378,7 +394,8 @@ $app->get(
 // get tags
 $app->get(
     '/tags',
-    function () use ($app) {
+    function () use ($app, $check_xhr) {
+        $check_xhr();
 
         echo getTags();
 
@@ -388,7 +405,8 @@ $app->get(
 // update
 $app->put(
     '/tag/:id',
-    function ($id) use ($app) {
+    function ($id) use ($app, $check_xhr) {
+        $check_xhr();
 
         $data = json_decode($app->request()->getBody());
 
@@ -430,7 +448,8 @@ $app->get(
 // create tag 
 $app->post(
     '/tag',
-    function () use ($app) {
+    function () use ($app, $check_xhr) {
+        $check_xhr();
 
         $userArr = getSessionUser();
 
@@ -459,7 +478,9 @@ $app->post(
 //sample
 // $app->get(
 //     '/task/:id',
-//     function ($id) use ($app) {
+//     function ($id) use ($app, $check_xhr) {
+//         $check_xhr();
+//
 //         echo '{"get":{"text":'. $id.'}}';
 //     }
 // );
