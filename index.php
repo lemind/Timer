@@ -6,6 +6,9 @@ $app = new \Slim\Slim(array(
     'view' => new \Slim\Views\Twig()
 ));
 
+$app->response->headers->set('Content-Security-Policy',
+        'frame-ancestors \'self\'');
+
 // GET route
 $app->get(
     '/',
