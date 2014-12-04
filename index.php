@@ -359,9 +359,8 @@ $app->put(
             $stmt = $db->prepare($sql);
             $stmt->bindParam(":name", $data->name);
             $stmt->bindParam(":color", $data->color);
-            $stmt->execute(array(
-                ':id' => $id,
-            ));
+            $stmt->bindParam(":id", $id);
+            $stmt->execute();
 
             echo '{"status_update": "ok"}';
         } catch(PDOException $e) {
@@ -421,9 +420,8 @@ $app->put(
             $stmt = $db->prepare($sql);
             $stmt->bindParam(":name", $data->name);
             $stmt->bindParam(":color", $data->color);
-            $stmt->execute(array(
-                ':id' => $id,
-            ));
+            $stmt->bindParam(":id", $id);
+            $stmt->execute();
 
             echo '{"status_update": "ok"}';
         } catch(PDOException $e) {
