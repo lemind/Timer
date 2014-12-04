@@ -5,35 +5,30 @@
 @default-width: 980px;
 
 
-.box-shadow(@style, @c) when (iscolor(@c)) 
-{
+.box-shadow(@style, @c) when (iscolor(@c)) {
   -webkit-box-shadow: @style @c;
   -moz-box-shadow:    @style @c;
   box-shadow:         @style @c;
 }
 
-.box-shadow(@style, @alpha: 50%) when (isnumber(@alpha)) 
-{
+.box-shadow(@style, @alpha: 50%) when (isnumber(@alpha)) {
   .box-shadow(@style, rgba(0, 0, 0, @alpha));
 }
 
-.box-sizing (@type: border-box) 
-{
+.box-sizing (@type: border-box) {
 	-webkit-box-sizing: @type;
 	-moz-box-sizing:    @type;
 	box-sizing:         @type;
 }
 
-.transition (@transition) 
-{
+.transition (@transition) {
 	-webkit-transition: @transition;  
 	-moz-transition:    @transition;
 	-ms-transition:     @transition; 
 	-o-transition:      @transition;  
 }
 
-.column-count (@cc)
-{
+.column-count (@cc) {
 	-webkit-column-count: @cc;
 	-moz-column-count:	  @cc;
 	column-count:		  @cc;
@@ -103,10 +98,10 @@ html { body
 	height: 100%;
 	font-family: 'Open Sans', sans-serif;
 	color: black;
+	min-width: @default-width;
 
 	/* Header - start */
-	.header
-	{
+	.header {
 		width: @default-width;
 		height: 88px;
 		background-color: #ebebeb;
@@ -114,14 +109,12 @@ html { body
 		padding: 10px;
 		.box-sizing(border-box);
 
-		h1 
-		{
+		h1 {
 			width: 150px;
 			display: inline-block;		
 		}
 
-		.nav
-		{
+		.nav {
 			display: inline-block;
 			margin-left: 50px;
 			vertical-align: middle;
@@ -132,84 +125,81 @@ html { body
 
 	/* Content - start */
 
-	.content
-	{
-		.main {
-			.row {
-				margin: 0;
-			}
-		}
-
+	.content {
 		background-color: #ebebeb;
 		max-width: @default-width;
 		margin: 0 auto;
 		padding: 10px;
 		box-sizing: border-box;
 
-		.time
-		{
+		.main {
+			.row {
+				margin: 0;
+			}
+		}
+
+		.time {
 			width: 100px;
 			display: inline-block;
 			padding: 0 10px;
-			text-align: right;			
+			text-align: right;
+			font-size: 1.5em;
+			vertical-align: middle;
 		}
 
-		.tasks
-		{
+		input.task {
+			padding-left: 5px;
+		}
+
+		.tasks {
 			margin-top: 30px;
 			text-align: center;
 
-			tr.task
-			{
+			table {
+				width: 100%;
+			}
+
+			tr.task {
 				height: @tr-height;
 
-				&.active
-				{
+				&.active {
 					background: khaki;
 				}
 
-				&:not(.active) .edited
-				{
+				&:not(.active) .edited {
 					cursor: pointer;
 
-					&:hover
-					{
+					&:hover {
 						background: plum;
 						color: #fff;
 					}
 				}
 			}
 
-			.line 
-			{
+			.line {
 				height: 5px;
 				background: lightgrey;
 			}
 
-			th
-			{
+			th {
 				width: 100px;
 			}
 
-			td
-			{
+			td {
 				text-align: center;
 				white-space: nowrap;
 
-				&.desc
-				{
+				&.desc {
 					position: relative;
 
-					.name
-					{
+					.name {
 						padding: 6px 5px;
 						box-sizing: border-box;
 						margin: 3px 0;
 						border-radius: 5px;
 					}
 
-					.input_desc
-					{
+					.input_desc {
 						width: 100%;
 						position: absolute;
 						top: 4px;
@@ -220,8 +210,7 @@ html { body
 						left: 0;
 						border: 1px solid darkgray;
 
-						input
-						{
+						input {
 							width: 100%;
 							padding: 0 3px;
 							box-sizing: border-box;
@@ -230,12 +219,10 @@ html { body
 				}
 			}
 
-			td.project
-			{
+			td.project {
 				position: relative;
 
-				.name 
-				{	
+				.name {	
 					padding: 6px 10px;
 					color: #fff;
 					border-radius: 5px;
@@ -251,8 +238,7 @@ html { body
 					&.project9 {background: @project9;}
 				}
 
-				.project-select2
-				{
+				.project-select2 {
 					position: absolute;
 					left: -50%;
 					top: 3px;
@@ -264,14 +250,12 @@ html { body
 				}
 			}
 
-			td .tags 
-			{
+			td .tags {
 				position: relative;
 				height: @tr-height;
 				border-radius: 5px;
 
-				.tags-select2
-				{
+				.tags-select2 {
 					position: absolute;
 					left: 0;
 					top: 0;
@@ -283,8 +267,7 @@ html { body
 					z-index: 1;
 				}
 
-				span.tag 
-				{
+				span.tag {
 					border-radius: 5px;
 					padding: 2px 8px;
 					margin: 0 3px;
@@ -310,17 +293,24 @@ html { body
 			}
 		}
 
-		.select2
-		{
+		.select2 {
 			display: inline-block;
 		}
 
-		.select2-container 
-		{
+		.select2-container  {
 			width: 200px;
 
 			&.search-task {
 				width: 400px;
+			}
+
+			&.project-name {
+				width: 180px;
+			}
+
+			&.tags-list {
+				width: 365px;
+				margin-left: 10px;
 			}
 		}
 	}
@@ -329,22 +319,23 @@ html { body
 
 	/* Summary-report - start */
 
-	.summary-report 
-	{
+	.summary-report  {
 		.content;
 
-		.filters
-		{
+		.filters {
 			margin-bottom: 20px;
 			
-			.period
-			{
+			.period {
 				display: inline-block;
+
+				input {
+					width: 75px;
+					padding-left: 5px;
+				}
 			}
 			
-			.filter
-			{
-				margin-right: 20px;
+			.filter {
+				margin-left: 10px;
 			}			
 		}
 
@@ -354,50 +345,42 @@ html { body
 			display: inline-block;
 			vertical-align: top;
 
-			.projects-list
-			{
-				.panel-heading
-				{
+			.projects-list {
+				.panel-heading {
 					padding: 5px 10px;
 					background: #fff;
 					border-bottom: 1px solid #ccc;
 				}
 
-				.panel-body
-				{
+				.panel-body {
 					padding: 10px;
 					background: #eee;
 
 					.task-desc,
-					.sum-desc
-					{
+					.sum-desc {
 						width: 75%;
 						display: inline-block;
 						padding-left: 5px;
 					}
 
-					.sum
-					{
+					.sum {
 						background: #ccc;
 					}
 				}
 			}
 		}
 
-		.projects-detailed-drilldown-pie
-		{
+		.projects-detailed-drilldown-pie {
 			display: inline-block;
 			width: 66%;
 			height: 600px;
 			margin-top: 30px;
 		}
 
-		.sum-time-tags-list
-		{
+		.sum-time-tags-list {
 			.column-count(3);
 
-			.sum-time-tag
-			{
+			.sum-time-tag {
 				width: 300px;
 				padding: 6px;
 				color: #fff;
@@ -419,34 +402,32 @@ html { body
 
 	/* Weekly-report - start */
 
-	.weekly-report 
-	{
+	.weekly-report {
 		.content;
 
-		.filters
-		{
+		.filters {
 			margin-bottom: 20px;
+
+			input {
+				width: 160px;
+				padding-left: 5px; 
+			}
 		}
 
-		.week-table
-		{
-			.table-header
-			{
-				.none
-				{
+		.week-table {
+			.table-header {
+				.none {
 					display: inline-block;
 					width: 20%;
 				}
 
-				.week
-				{
+				.week {
 					display: inline-block;
 					margin: 0 0 0 -4px;
 					width: 80%;
 
 					.week-day,
-					.week-sum
-					{
+					.week-sum {
 						display: inline-block;
 						padding: 10px;
 						width: 12.5%;
@@ -462,17 +443,14 @@ html { body
 			}
 
 			.project-line,
-			.sum-by-day
-			{
+			.sum-by-day {
 
-				&:nth-child(even) 
-				{
+				&:nth-child(even) {
 					background: #ddd;
 				}
 
 				.project-name,
-				.sum-label
-				{
+				.sum-label {
 					display: inline-block;
 					width: 20%;
 					padding: 10px 0 10px 5px;
@@ -480,8 +458,7 @@ html { body
 				}
 
 				.project-week,
-				.week-line
-				{
+				.week-line {
 					list-style: none;
 					margin: 0 0 0 -4px;
 					display: inline-block;
@@ -491,8 +468,7 @@ html { body
 					.project-day,
 					.project-sum,
 					.sum-day,
-					.sum-week
-					{
+					.sum-week {
 						display: inline-block;
 						width: 12.5%;
 						text-align: center;
@@ -503,17 +479,14 @@ html { body
 						min-height: 40px;
 						vertical-align: top;
 
-						&:last-child
-						{
+						&:last-child {
 							border-left: none;
 						}
 					}
 
 					.project-day,
-					.sum-day
-					{
-						.clock-popup
-						{
+					.sum-day {
+						.clock-popup {
 							display: none;
 							width: 440px;
 							height: 220px;
@@ -530,51 +503,42 @@ html { body
 							}
 						}
 
-						&:hover
-						{
-							.clock-popup
-							{
+						&:hover {
+							.clock-popup {
 								display: block;
 							}
 						}
 					}
 
-					.project-sum
-					{
+					.project-sum {
 						background: #bbb;
 						border-bottom: 1px solid #ddd;
 					}
 				}
 
-				.project-tasks-list
-				{
-					.project-task
-					{
+				.project-tasks-list {
+					.project-task {
 						border-bottom: 1px solid #bbb;
 
-						&:first-child
-						{
+						&:first-child {
 							border-top: 1px solid #bbb;
 						}
 
-						.project-task-desc
-						{
+						.project-task-desc {
 							display: inline-block;
 							width: 20%;
 							padding: 10px 0 10px 5px;
 							box-sizing: border-box;
 						}
 
-						.project-task-line
-						{	
+						.project-task-line {	
 							width: 80%;
 							margin: 0 0 0 -4px;
 							display: inline-block;
 							vertical-align: top;
 
 							.project-task-time,
-							.project-task-sum
-							{
+							.project-task-sum {
 								display: inline-block;
 								width: 12.5%;
 								text-align: center;
@@ -586,8 +550,7 @@ html { body
 								vertical-align: top;
 							}
 
-							.project-task-sum
-							{
+							.project-task-sum {
 								background: #bbb;
 								border-bottom: 1px solid #ddd;
 							}
@@ -596,12 +559,10 @@ html { body
 				}
 			}
 
-			.sum-by-day
-			{
+			.sum-by-day {
 				background: #ccc;
 
-				.sum-week
-				{
+				.sum-week {
 					background: #aaa;
 				}
 			}
@@ -616,13 +577,23 @@ html { body
 
 		.tags-edit-list {
 			.tag-item {
+				height: 32px;
+				position: relative;
+
+				.tag-name {
+					display: inline-block;
+					margin-top: 5px;
+					padding-left: 35px;
+				}
+
 				.tag-color {
 					width: 20px;
 					height: 20px;
 					display: inline-block;
-					margin-right: 10px;
-					margin-top: 5px;
+					position: absolute;
+					top: 4px;
 				}
+
 				.edit-tag-block {
 					display: inline-block;
 
@@ -662,13 +633,23 @@ html { body
 
 		.projects-edit-list {
 			.project-item {
+				height: 32px;
+				position: relative;
+
+				.project-name {
+					display: inline-block;
+					margin-top: 5px;
+					padding-left: 35px;
+				}
+
 				.project-color {
 					width: 20px;
 					height: 20px;
 					display: inline-block;
-					margin-right: 10px;
-					margin-top: 5px;
+					position: absolute;
+					top: 4px;
 				}
+
 				.edit-project-block {
 					display: inline-block;
 
@@ -715,6 +696,20 @@ html { body
 
 		.filters-period {
 			.summary-report .filters;
+
+			display: inline-block;
+			margin-left: 10px;
+
+			.period {
+				input {
+					width: 75px;
+					padding-left: 5px;
+				}
+			}
+
+			.filter {
+				margin-left: 10px;
+			}
 		}
 
 		.filter-task-list {
@@ -764,8 +759,7 @@ html { body
 
 	/* Footer - start */
 
-	.footer
-	{
+	.footer {
 		height: 68px;
 		max-width: @default-width;
 		margin: 0 auto;	
