@@ -264,9 +264,8 @@ $app->put(
                 $stmt->bindParam(":periods", $periods);
             }
             $stmt->bindParam(":status", $data->status);
-            $stmt->execute(array(
-                ':id' => $id,
-            ));
+            $stmt->bindParam(":id", $id);
+            $stmt->execute();
 
             echo '{"status_update": "ok"}';
         } catch(PDOException $e) {
