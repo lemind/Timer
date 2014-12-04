@@ -45,17 +45,22 @@
 	<script src="./js/views/tagsEdit.js"></script>
 	<script src="./js/views/projectsEdit.js"></script>
 
+	<meta name="app_data.tags" content="{{tags}}" />
+	<meta name="app_data.projects" content="{{projects}}" />
+	<meta name="app_data.tasks" content="{{tasks}}" />
+	<meta name="app_data.user" content="{{user}}" />
+
 	<script>
 		//Loading Bootstrapped Models
 		var tags = new Tags();
-		tags.reset(JSON.parse('{{tags}}'.replace(/&quot;/g,'"')));
+		tags.reset(JSON.parse($('meta[name="app_data.tags"]').attr('content')));
 
 		var projects = new Projects();
-		projects.reset(JSON.parse('{{projects}}'.replace(/&quot;/g,'"')));
+		projects.reset(JSON.parse($('meta[name="app_data.projects"]').attr('content')));
 
 		//var tasks = new Tasks();
-		//tasks.reset(JSON.parse('{{tasks}}'.replace(/&quot;/g,'"')));
-		var currentUser = JSON.parse('{{user}}'.replace(/&quot;/g,'"'));
+		//tasks.reset(JSON.parse($('meta[name="app_data.tasks"]').attr('content')));
+		var currentUser = JSON.parse($('meta[name="app_data.user"]').attr('content'));
 	</script>
 
 </head>
