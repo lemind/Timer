@@ -118,6 +118,20 @@ html { body
 			display: inline-block;
 			margin-left: 50px;
 			vertical-align: middle;
+
+			li:not(.active) {
+				a:hover {
+					background: #ddd;
+				}
+			}
+
+			li {
+				&.active {
+					a:hover {
+						cursor: default;
+					}
+				}
+			}
 		}
 	}
 	/* Header - end */

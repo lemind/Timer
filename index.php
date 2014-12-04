@@ -378,6 +378,7 @@ $app->get(
                 'user' => $auth->user,
                 'userEmail' => $auth->userEmail,
                 'authFl' => $auth->authFl,
+                'page' => 'projects'
             )
         );
 
@@ -438,6 +439,7 @@ $app->get(
                 'user' => $auth->user,
                 'userEmail' => $auth->userEmail,
                 'authFl' => $auth->authFl,
+                'page' => 'tags'
             )
         );
 
