@@ -58,6 +58,12 @@ $(function(){
 
 		tasks.comparator = 'date'; //sort by date
 
+		intro = introJs()
+		
+		intro.setOptions({ 
+			steps: INTRO_STEPS.indexSteps
+		});
+
 		$('html').click(function() {
 			if ($("." + project_select2_str).length > 0) {
 				$("." + project_select2_str).remove();
@@ -640,6 +646,19 @@ $(function(){
 		});
 
 		var timer = new Timer();
+
+		// var Header = Backbone.View.extend({
+		// 	el: '.header', 
+		// 	events: {
+		// 		"click .show-help": "showHelp"
+		// 	},
+		// 	showHelp: function () {
+		// 		intro.start();
+		// 	}
+		// });
+
+		// var header = new Header();
+
 	}
 
 });

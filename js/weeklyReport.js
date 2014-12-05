@@ -4,6 +4,13 @@ $(function(){
 
 	    var tasks = new Tasks();
 
+		intro = introJs();
+
+		intro.setOptions({ 
+			steps: INTRO_STEPS.weeklyReportSteps
+		});
+
+
 	    function initWeekHover () {
 			setTimeout(function() {
 			    $('.week .ui-datepicker-calendar tr').on('mousemove', function () {

@@ -3,7 +3,14 @@ $(function(){
 	if ($(".summary-report").length) {
 
 	    var tasks = new Tasks();
-	    tasks.comparator = 'date'; //sort by date
+
+		tasks.comparator = 'date'; //sort by date
+
+		intro = introJs();
+
+		intro.setOptions({ 
+			steps: INTRO_STEPS.summaryReportSteps
+		});
 
 		//period
 	    $( "#from" ).attr("placeholder", "period start").datepicker({

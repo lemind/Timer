@@ -10,6 +10,12 @@ $(function(){
 
 		tasks.comparator = 'date'; //sort by date
 
+		intro = introJs();
+
+		intro.setOptions({ 
+			steps: INTRO_STEPS.taskReportSteps
+		});
+
 		function resetSearchSelect2 () {
 			search_task.select2('data', '');
 		}
