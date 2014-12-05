@@ -85,8 +85,8 @@
 			<li class="{{ (page == 'projects') ? 'hide'}} {{ (page == 'tags') ? 'hide'}}"><a class="show-help" href="#">?</a></li>
 		</ul>
 
-		<span class="pull-right {{ (authFl == 1) ? 'hide'}}"><a href="{{ authUrl }}">Login</a></span>
-		<span class="pull-right {{ (authFl == 0) ? 'hide'}}">
+		<span class="login-block {{ (authFl == 1) ? 'hide'}}"><a href="{{ authUrl }}">Login</a></span>
+		<span class="login-block {{ (authFl == 0) ? 'hide'}}">
 			<span>{{ userEmail }}</span>
 			<span><a href="logout.php">Logout</a></span>
 		</span>
