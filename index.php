@@ -485,15 +485,15 @@ $app->post(
     }
 );
 
-//sample
-// $app->get(
-//     '/task/:id',
-//     function ($id) use ($app, $check_xhr) {
-//         $check_xhr();
-//
-//         echo '{"get":{"text":'. $id.'}}';
-//     }
-// );
+//test
+$app->get(
+    '/test',
+    function () use ($app, $check_xhr) {
+        $check_xhr();
+
+        echo '{"get":{"text":'. getenv('CLEARDB_DATABASE_URL') .'}}';
+    }
+);
 
 $app->run();
 
