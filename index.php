@@ -489,7 +489,7 @@ $app->post(
 $app->get(
     '/test',
     function () use ($app, $check_xhr) {
-        $check_xhr();
+        //$check_xhr();
 
         echo '{"get":{"text":'. getenv('CLEARDB_DATABASE_URL') .'}}';
     }
