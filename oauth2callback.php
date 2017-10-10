@@ -9,7 +9,11 @@ if (!ini_get('display_errors')) {
 $code = $_GET['code'];
 
 //get config
-$config = file_get_contents("../config.json");
+if (file_exists("../config.json")) {
+    $config = file_get_contents("../config.json");
+} else {
+    $config = "{}";
+}
 $configArr = new stdClass;
 
 $jsonIterator = new RecursiveIteratorIterator(
@@ -19,6 +23,16 @@ $jsonIterator = new RecursiveIteratorIterator(
 foreach ($jsonIterator as $key => $val) {
     //todo fix for array is_array
     $configArr->$key = $val;
+}
+
+if (!isset($configArr->client_id)) {
+    $configArr->client_id = getenv('TIMER_CLIENT_ID');
+}
+if (!isset($configArr->client_secret)) {
+    $configArr->client_secret = getenv('TIMER_CLIENT_SECRET');
+}
+if (!isset($configArr->redirect_uri)) {
+    $configArr->redirect_uri = getenv('TIMER_REDIRECT_URI');
 }
 
 $client = new Google_Client();
