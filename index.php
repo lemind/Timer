@@ -480,7 +480,7 @@ $app->post(
 
             echo json_encode($data);
         } catch(PDOException $e) {
-            echo '{"error project":{"text":'. $e->getMessage() .'}}';
+            echo '{"error tag":{"text":'. $e->getMessage() .'}}';
         }
     }
 );
@@ -491,7 +491,7 @@ $app->get(
     function () use ($app, $check_xhr) {
         //$check_xhr();
 
-        echo '{"get":{"text":'. getenv('CLEARDB_DATABASE_URL') .'}}';
+        //echo '{"get":{"text":'. getenv('CLEARDB_DATABASE_URL') .'}}';
     }
 );
 

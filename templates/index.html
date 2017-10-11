@@ -41,6 +41,7 @@
 						<td class="desc"><div class="name edited"><%= task.get('desc') %></div></td>
 						<td><%= task.get('time_str') %></td>
 						<td class="project">
+						<span><%= console.log(projects.get(task.get('project_id')).get('color')) %></span>
 							<div class="name edited <%= colors['projects'][projects.get(task.get('project_id')).get('color')] %>" task_id="<%= task.get('id') %>"><%= projects.get(task.get('project_id')).get('name') %></div>
 						</td>
 						<td><button type="submit" class="btn start btn-default <%= task.get('status') == 1 && 'hide' %>">Start</button></td>

@@ -133,14 +133,26 @@ function getConnection() {
         $configArr->$key = $val;
     }
 
-    if (!isset($configArr->client_id)) {
-        $configArr->client_id = getenv('TIMER_CLIENT_ID');
+    if (!isset($configArr->dbhost)) {
+        $configArr->dbhost = getenv('TIMER_DBHOST');
+        if ($configArr->dbhost === FALSE) {
+            $configArr->dbhost = getenv('OPENSHIFT_MYSQL_DB_HOST');
+        }
     }
-    if (!isset($configArr->client_secret)) {
-        $configArr->client_secret = getenv('TIMER_CLIENT_SECRET');
+    if (!isset($configArr->dbuser)) {
+        $configArr->dbuser = getenv('TIMER_DBUSER');
+        if ($configArr->dbuser === FALSE) {
+            $configArr->dbuser = getenv('OPENSHIFT_MYSQL_DB_USERNAME');
+        }
     }
-    if (!isset($configArr->redirect_uri)) {
-        $configArr->redirect_uri = getenv('TIMER_REDIRECT_URI');
+    if (!isset($configArr->dbpass)) {
+        $configArr->dbpass = getenv('TIMER_DBPASS');
+        if ($configArr->dbpass === FALSE) {
+            $configArr->dbpass = getenv('OPENSHIFT_MYSQL_DB_PASSWORD');
+        }
+    }
+    if (!isset($configArr->dbname)) {
+        $configArr->dbname = getenv('TIMER_DBNAME');
     }
 
     $dbhost=$configArr->dbhost;

@@ -44,6 +44,7 @@
 
             if (!edit_active) {
                 current_project = el_project.attr("project-id");
+
                 current_color = projects.get(current_project).get('color');
                 el_project.parent().append('<div class="edit-project-block"></div>');
                 el_project.parent().find('.edit-project-block').append('<div class="input-edit-project editing"><input></div>');
